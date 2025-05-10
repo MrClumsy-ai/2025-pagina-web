@@ -1,3 +1,7 @@
+body {
+  background-image: url("algo.png");
+  background-repeat: no-repeat;
+}
 #navbar {
   background-color: #214e34;
   opacity: 0.5;
