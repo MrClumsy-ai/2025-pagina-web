@@ -1,17 +1,83 @@
+:root {
+  --verde-oscuro: #214e34;
+  --verde-claro: #a0e548;
+  --blanco: #d6ecd4;
+  --azul-oscuro: #011638;
+  --azul-claro: #9ac1f0;
+}
+
 body {
+  background-color: var(--azul-oscuro);
+}
+
+nav {
+  background-color: var(--verde-oscuro);
+  opacity: 0.7;
+}
+
+header {
   background-image: url("algo.png");
   background-repeat: no-repeat;
 }
 
-h1 {
+header h1 {
   color: #011638;
+  text-shadow: 2px 2px 5px black;
   font-weight: bold;
   font-size: 60pt;
-  margin-top: 20%;
+  margin-top: 40%;
   margin-inline-start: 10%;
 }
 
-#navbar {
-  background-color: #214e34;
-  opacity: 0.7;
+hr {
+  color: var(--azul-claro);
+}
+
+main {
+  margin-top: 50px;
+}
+
+main h2 {
+  color: white;
+  font-weight: bold;
+  margin-bottom: 50px;
+}
+
+section {
+  background-color: var(--blanco);
+  margin-bottom: 25px;
+  position: relative;
+  height: 200px;
+  width: 100%;
+}
+
+section img {
+  position: absolute;
+  top: 25px;
+  left: 25px;
+  width: 150px;
+  height: 150px;
+}
+
+section div {
+  margin-inline-start: 150px;
+}
+
+button {
+  width: 250px;
+  color: white;
+  font-weight: bold;
+  background-color: var(--verde-claro);
+  border: none;
+  transition-duration: 0.2s;
+}
+
+button:hover {
+  background-color: var(--verde-oscuro);
+}
+
+section button {
+  position: absolute;
+  right: 10%;
+  top: 35%;
 }
