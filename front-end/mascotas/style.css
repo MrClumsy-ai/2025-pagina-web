@@ -1,0 +1,35 @@
+main {
+  margin-top: 80px;
+}
+
+main h2 {
+  color: white;
+  font-weight: bold;
+  margin-bottom: 50px;
+}
+
+article {
+  background-color: var(--blanco);
+  margin-bottom: 25px;
+  position: relative;
+  height: 200px;
+  width: 100%;
+}
+
+article img {
+  position: absolute;
+  top: 25px;
+  left: 25px;
+  width: 150px;
+  height: 150px;
+}
+
+article div {
+  margin-inline-start: 150px;
+}
+
+article button {
+  position: absolute;
+  right: 10%;
+  top: 35%;
+}

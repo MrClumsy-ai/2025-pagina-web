@@ -12,38 +12,17 @@ header h1 {
   margin-inline-start: 10%;
 }
 
-main {
-  margin-top: 50px;
-}
-
-main h2 {
+main a {
+  width: 250px;
   color: white;
   font-weight: bold;
-  margin-bottom: 50px;
+  text-decoration: none;
+  text-align: center;
+  background-color: var(--verde-claro);
+  border: none;
+  transition-duration: 0.2s;
 }
 
-article {
-  background-color: var(--blanco);
-  margin-bottom: 25px;
-  position: relative;
-  height: 200px;
-  width: 100%;
-}
-
-article img {
-  position: absolute;
-  top: 25px;
-  left: 25px;
-  width: 150px;
-  height: 150px;
-}
-
-article div {
-  margin-inline-start: 150px;
-}
-
-article button {
-  position: absolute;
-  right: 10%;
-  top: 35%;
+main a:hover {
+  background-color: var(--verde-oscuro);
 }
