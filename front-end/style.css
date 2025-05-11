@@ -22,7 +22,7 @@ main h2 {
   margin-bottom: 50px;
 }
 
-article {
+section {
   background-color: var(--blanco);
   margin-bottom: 25px;
   position: relative;
@@ -30,7 +30,7 @@ article {
   width: 100%;
 }
 
-article img {
+section img {
   position: absolute;
   top: 25px;
   left: 25px;
@@ -38,11 +38,11 @@ article img {
   height: 150px;
 }
 
-article div {
+section div {
   margin-inline-start: 150px;
 }
 
-article button {
+section button {
   position: absolute;
   right: 10%;
   top: 35%;
