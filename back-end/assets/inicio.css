@@ -1,0 +1,28 @@
+header {
+  background-image: url("algo.png");
+  background-repeat: no-repeat;
+}
+
+header h1 {
+  color: #011638;
+  text-shadow: 2px 2px 5px black;
+  font-weight: bold;
+  font-size: 60pt;
+  margin-top: 40%;
+  margin-inline-start: 10%;
+}
+
+main a {
+  width: 250px;
+  color: white;
+  font-weight: bold;
+  text-decoration: none;
+  text-align: center;
+  background-color: var(--verde-claro);
+  border: none;
+  transition-duration: 0.2s;
+}
+
+main a:hover {
+  background-color: var(--verde-oscuro);
+}
