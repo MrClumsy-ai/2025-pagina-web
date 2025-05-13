@@ -1,6 +1,11 @@
 header {
-  background-image: url("algo.png");
+  background-image: url("img/mascota00.jpg"); 
+  background-size: cover;
+  background-position: center;
   background-repeat: no-repeat;
+  height: 100vh;
+  display: flex;
+  align-items: center;
 }
 
 header h1 {
@@ -10,15 +15,6 @@ header h1 {
   font-size: 60pt;
   margin-top: 40%;
   margin-inline-start: 10%;
-}
-header {
-  background-image: url("img/mascota00.jpg"); 
-  background-size: cover;
-  background-position: center;
-  background-repeat: no-repeat;
-  height: 100vh;
-  display: flex;
-  align-items: center;
 }
 
 main a {

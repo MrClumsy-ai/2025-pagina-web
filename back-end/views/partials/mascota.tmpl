@@ -1,13 +1,15 @@
 {{ define "mascota" }}
+{{ range . }}
 <article class="container rounded-5 p-5">
-  <img src="#" alt="Foto de la mascota" />
+  <img src="data:image/jpeg;base64,{{ .Foto64 }}" alt="Foto de la mascota" />
   <div>
-    <h3>Nombre de la mascota</h3>
+    <h3>{{ .Nombre }}</h3>
     <ul>
-      <li>Edad: 8 anios</li>
-      <li>Altura: 23cm</li>
+      <li>Edad: {{ .Edad }} anios</li>
+      <li>Altura: {{ .Altura }}cm</li>
     </ul>
     <button class="p-4 rounded-pill" type="button">Ver Detalles</button>
   </div>
 </article>
+{{ end }}
 {{ end }}

@@ -2,8 +2,10 @@ package main
 
 import (
 	"database/sql"
+	"encoding/base64"
 	"html/template"
 	"io"
+	"os"
 
 	"github.com/labstack/echo/v4"
 	_ "github.com/mattn/go-sqlite3"
@@ -25,12 +27,9 @@ func newTemplate() *Templates {
 	}
 }
 
-type Counter struct {
-	Count int
-}
-
 type Mascota struct {
 	Foto        []byte
+	Foto64      string
 	Nombre      string
 	Edad        int
 	Altura      int
@@ -47,14 +46,20 @@ func main() {
 	}
 	defer dbConnection.Close()
 
-	mascotas := []Mascota{
-		Mascota{Nombre: "lorem", Edad: 1, Altura: 23, Descripcion: "lorem ipsum lalalala"},
-		Mascota{Nombre: "ipsum", Edad: 2, Altura: 12, Descripcion: "lorem ipsum lalalala"},
-		Mascota{Nombre: "something", Edad: 3, Altura: 34, Descripcion: "lorem ipsum lalalala"},
-		Mascota{Nombre: "else", Edad: 4, Altura: 31, Descripcion: "lorem ipsum lalalala"},
-	}
+	var mascotas []Mascota
 
 	e.GET("/", func(c echo.Context) error {
+		foto, err := os.ReadFile("assets/mascota00.jpg")
+		if err != nil {
+			e.Logger.Fatal("failed to load file")
+		}
+		base64str := base64.StdEncoding.EncodeToString(foto)
+		e.Logger.Printf("retrieved file")
+		mascotas = []Mascota{
+			Mascota{Foto64: base64str, Nombre: "lorem", Edad: 1, Altura: 23, Descripcion: "lorem ipsum lalalala"},
+			Mascota{Foto64: base64str, Nombre: "ipsum", Edad: 2, Altura: 12, Descripcion: "lorem ipsum lalalala"},
+			Mascota{Foto64: base64str, Nombre: "something", Edad: 3, Altura: 34, Descripcion: "lorem ipsum lalalala"},
+		}
 		return c.Render(200, "inicio", mascotas)
 	})
 	e.Logger.Fatal(e.Start(":8000"))
