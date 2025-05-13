@@ -19,7 +19,7 @@ header h1 {
 
 main a {
   width: 250px;
-  color: white;
+  color: black;
   font-weight: bold;
   text-decoration: none;
   text-align: center;
@@ -29,5 +29,6 @@ main a {
 }
 
 main a:hover {
+  color: white;
   background-color: var(--verde-oscuro);
 }
