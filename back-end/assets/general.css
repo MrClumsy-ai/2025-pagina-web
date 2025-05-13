@@ -8,6 +8,7 @@
 
 body {
   background-color: var(--azul-oscuro);
+  font-family: "Poppins", sans-serif;
 }
 
 nav {
@@ -24,7 +25,7 @@ hr {
 
 button {
   width: 250px;
-  color: white;
+  color: black;
   font-weight: bold;
   background-color: var(--verde-claro);
   border: none;
