@@ -49,7 +49,7 @@ func main() {
 	var mascotas []Mascota
 
 	e.GET("/", func(c echo.Context) error {
-		foto, err := os.ReadFile("assets/mascota00.jpg")
+		foto, err := os.ReadFile("assets/img/splash.jpg")
 		if err != nil {
 			e.Logger.Fatal("failed to load file")
 		}

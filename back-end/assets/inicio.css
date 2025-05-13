@@ -1,5 +1,9 @@
+body {
+  margin-bottom: 80px;
+}
+
 header {
-  background-image: url("mascota00.jpg");
+  background-image: url("img/splash.jpg");
   background-size: cover;
   background-position: center;
   background-repeat: no-repeat;

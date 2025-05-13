@@ -1,6 +1,13 @@
-main * {
+main h1,
+main p,
+main li {
   color: white;
 }
+
+button {
+  color: var(--negro);
+}
+
 .img-forma {
   width: 100%;
   max-width: 200px;
@@ -8,9 +15,11 @@ main * {
   display: block;
   margin: 0 auto;
 }
+
 .imagen-circular {
   width: 200px;
   height: 200px;
   border-radius: 50%;
-  object-fit: cover;  
+  object-fit: cover;
 }
+

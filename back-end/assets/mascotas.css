@@ -52,6 +52,7 @@ article button {
 
 .modal-content {
   background-color: #234c2f;
+  opacity: 0.9;
   color: white;
   padding: 30px;
   border-radius: 20px;

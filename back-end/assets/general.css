@@ -4,6 +4,7 @@
   --blanco: #d6ecd4;
   --azul-oscuro: #011638;
   --azul-claro: #9ac1f0;
+  --negro: #333;
 }
 
 body {
@@ -13,7 +14,7 @@ body {
 
 nav {
   background-color: var(--verde-oscuro);
-  opacity: 0.7;
+  opacity: 0.85;
 }
 
 hr {
@@ -25,14 +26,16 @@ hr {
 
 button {
   width: 250px;
-  color: black;
+  color: var(--negro);
   font-weight: bold;
   background-color: var(--verde-claro);
   border: none;
   transition-duration: 0.2s;
+  box-shadow: 2px 2px var(--negro);
 }
 
 button:hover {
   color: white;
   background-color: var(--verde-oscuro);
+  box-shadow: 2px 2px var(--negro);
 }
