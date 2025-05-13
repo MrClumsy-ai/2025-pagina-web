@@ -50,7 +50,6 @@
             <li>Altura: 48cm</li>
           </ul>
           <button class="p-4 rounded-pill" type="button" onclick="mostrarModal()">Ver Detalles</button>
-
         </div>
       </article>
       <article class="container rounded-5 p-5">
@@ -62,7 +61,6 @@
             <li>Altura: 48cm</li>
           </ul>
           <button class="p-4 rounded-pill" type="button" onclick="mostrarModal()">Ver Detalles</button>
-
         </div>
       </article>
       <article class="container rounded-5 p-5">
@@ -74,10 +72,8 @@
             <li>Altura: 48cm</li>
           </ul>
           <button class="p-4 rounded-pill" type="button" onclick="mostrarModal()">Ver Detalles</button>
-
         </div>
       </article>
-
     </div>
   </main>
   <div id="detalleMascota" class="modal-mascota">
@@ -93,15 +89,15 @@
       <button class="adopt-btn">Solicitar adopción</button>
     </div>
   </div>
+  <script>
+    function mostrarModal() {
+      document.getElementById("detalleMascota").style.display = "flex";
+    }
+
+    function cerrarModal() {
+      document.getElementById("detalleMascota").style.display = "none";
+    }
+  </script>
 </body>
 
 </html>
-<script>
-  function mostrarModal() {
-    document.getElementById("detalleMascota").style.display = "flex";
-  }
-
-  function cerrarModal() {
-    document.getElementById("detalleMascota").style.display = "none";
-  }
-</script>

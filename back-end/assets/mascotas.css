@@ -33,3 +33,51 @@ article button {
   right: 10%;
   top: 35%;
 }
+
+.modal-mascota {
+  display: none;
+  position: fixed;
+  z-index: 1000;
+  left: 0; top: 0;
+  width: 100%; height: 100%;
+  background-color: rgba(0, 0, 0, 0.5);
+  justify-content: center;
+  align-items: center;
+}
+
+.modal-content {
+  background-color: #234c2f;
+  color: white;
+  padding: 30px;
+  border-radius: 20px;
+  width: 300px;
+  text-align: center;
+  position: relative;
+}
+
+.modal-content img {
+  width: 60%;
+  aspect-ratio: 1 / 1;        
+  object-fit: cover;           
+  border-radius: 20px;
+  margin-bottom: 15px;
+}
+
+
+.close-btn {
+  position: absolute;
+  top: 10px; right: 15px;
+  font-size: 30px;
+  cursor: pointer;
+}
+
+.adopt-btn {
+  background-color: #c7ff5c;
+  border: none;
+  color: black;
+  font-weight: bold;
+  padding: 10px 20px;
+  border-radius: 25px;
+  cursor: pointer;
+  margin-top: 15px;
+}

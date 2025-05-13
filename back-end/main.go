@@ -74,5 +74,13 @@ func main() {
 		}
 		return c.Render(200, "adopcion", response)
 	})
+
+	e.GET("/mascotas", func(c echo.Context) error {
+		response := map[string]any{
+			"CurrentRoute": "/mascotas",
+			"Mascotas":     mascotas,
+		}
+		return c.Render(200, "mascotas", response)
+	})
 	e.Logger.Fatal(e.Start(":8000"))
 }
