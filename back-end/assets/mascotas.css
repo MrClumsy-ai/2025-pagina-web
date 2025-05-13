@@ -18,10 +18,13 @@ article {
 
 article img {
   position: absolute;
+  width: 150px;
   top: 25px;
   left: 25px;
-  width: 150px;
-  height: 150px;
+  aspect-ratio: 1 / 1;
+  object-fit: cover;
+  border-radius: 20px;
+  margin-bottom: 15px;
 }
 
 article div {
