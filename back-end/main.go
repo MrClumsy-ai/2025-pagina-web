@@ -57,9 +57,9 @@ func main() {
 		e.Logger.Printf("retrieved file")
 		// test
 		mascotas = []Mascota{
-			Mascota{Foto64: base64str, Nombre: "lorem", Edad: 1, Altura: 23, Descripcion: "lorem ipsum lalalala"},
-			Mascota{Foto64: base64str, Nombre: "ipsum", Edad: 2, Altura: 12, Descripcion: "lorem ipsum lalalala"},
-			Mascota{Foto64: base64str, Nombre: "something", Edad: 3, Altura: 34, Descripcion: "lorem ipsum lalalala"},
+			{Foto64: base64str, Nombre: "lorem", Edad: 1, Altura: 23, Descripcion: "lorem ipsum lalalala"},
+			{Foto64: base64str, Nombre: "ipsum", Edad: 2, Altura: 12, Descripcion: "lorem ipsum lalalala"},
+			{Foto64: base64str, Nombre: "something", Edad: 3, Altura: 34, Descripcion: "lorem ipsum lalalala"},
 		}
 		response := map[string]any{
 			"CurrentRoute": "/",

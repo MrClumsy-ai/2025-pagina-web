@@ -8,8 +8,19 @@
       <li>Edad: {{ .Edad }} anios</li>
       <li>Altura: {{ .Altura }}cm</li>
     </ul>
-    <button class="p-4 rounded-pill" type="button">Ver Detalles</button>
+    <button class="p-4 rounded-pill" type="button" onclick="mostrarModal()">Ver Detalles</button>
   </div>
 </article>
+<div id="detalleMascota" class="modal-mascota">
+  <div class="modal-content">
+    <span class="close-btn" onclick="cerrarModal()">&times;</span>
+    <img src="data:image/jpeg;base64,{{ .Foto64 }}" alt="Foto de la mascota" />
+    <h2>{{ .Nombre }}</h2>
+    <p><strong>Edad:</strong> {{ .Edad }} años</p>
+    <p><strong>Altura:</strong> {{ .Altura}}cm</p>
+    <p> {{ .Descripcion }} </p>
+    <button class="adopt-btn">Solicitar adopción</button>
+  </div>
+</div>
 {{ end }}
 {{ end }}
