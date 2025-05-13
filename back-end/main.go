@@ -29,6 +29,14 @@ type Counter struct {
 	Count int
 }
 
+type Mascota struct {
+	Foto        []byte
+	Nombre      string
+	Edad        int
+	Altura      int
+	Descripcion string
+}
+
 func main() {
 	e := echo.New()
 	e.Static("/assets", "assets")
@@ -39,11 +47,15 @@ func main() {
 	}
 	defer dbConnection.Close()
 
-	count := Counter{Count: 0}
+	mascotas := []Mascota{
+		Mascota{Nombre: "lorem", Edad: 1, Altura: 23, Descripcion: "lorem ipsum lalalala"},
+		Mascota{Nombre: "ipsum", Edad: 2, Altura: 12, Descripcion: "lorem ipsum lalalala"},
+		Mascota{Nombre: "something", Edad: 3, Altura: 34, Descripcion: "lorem ipsum lalalala"},
+		Mascota{Nombre: "else", Edad: 4, Altura: 31, Descripcion: "lorem ipsum lalalala"},
+	}
 
 	e.GET("/", func(c echo.Context) error {
-		count.Count++
-		return c.Render(200, "inicio", count)
+		return c.Render(200, "inicio", mascotas)
 	})
 	e.Logger.Fatal(e.Start(":8000"))
 }
