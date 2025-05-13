@@ -1,6 +1,6 @@
 # TODO
 
-- [ ] agregar imagenes
+- [x] agregar imagenes
 - [ ] agregar funcionalidad
 - [ ] agregar texto a contacto
 

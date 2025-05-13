@@ -55,16 +55,24 @@ func main() {
 		}
 		base64str := base64.StdEncoding.EncodeToString(foto)
 		e.Logger.Printf("retrieved file")
+		// test
 		mascotas = []Mascota{
 			Mascota{Foto64: base64str, Nombre: "lorem", Edad: 1, Altura: 23, Descripcion: "lorem ipsum lalalala"},
 			Mascota{Foto64: base64str, Nombre: "ipsum", Edad: 2, Altura: 12, Descripcion: "lorem ipsum lalalala"},
 			Mascota{Foto64: base64str, Nombre: "something", Edad: 3, Altura: 34, Descripcion: "lorem ipsum lalalala"},
 		}
-		return c.Render(200, "inicio", mascotas)
+		response := map[string]any{
+			"CurrentRoute": "/",
+			"Mascotas":     mascotas,
+		}
+		return c.Render(200, "inicio", response)
 	})
 
 	e.GET("/adopcion", func(c echo.Context) error {
-		return c.Render(200, "adopcion", nil)
+		response := map[string]any{
+			"CurrentRoute": "/adopcion",
+		}
+		return c.Render(200, "adopcion", response)
 	})
 	e.Logger.Fatal(e.Start(":8000"))
 }
