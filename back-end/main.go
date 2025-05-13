@@ -62,5 +62,9 @@ func main() {
 		}
 		return c.Render(200, "inicio", mascotas)
 	})
+
+	e.GET("/adopcion", func(c echo.Context) error {
+		return c.Render(200, "adopcion", nil)
+	})
 	e.Logger.Fatal(e.Start(":8000"))
 }
