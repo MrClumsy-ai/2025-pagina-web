@@ -1,6 +1,9 @@
 # TODO
 
-- [x] agregar imagenes
+- [ ] crear base de datos sqlite3
+- [ ] cambiar fondo de inicio
+- [ ] agregar contacto
+- [ ] agregar mascotas
 - [ ] agregar funcionalidad
 - [ ] agregar texto a contacto
 
