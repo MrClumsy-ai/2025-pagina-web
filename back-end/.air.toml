@@ -1,0 +1,12 @@
+root = "."
+tmp_dir = "tmp"
+
+[build]
+  cmd = "go build -o ./tmp/main ."
+  bin = "tmp/main"
+  exclude_dir = ["node_modules", "vendor", "tmp"]  # Remove "assets" from here
+  include_ext = ["go", "html", "tpl", "tmpl", "css", "js"]  # Add extensions if needed
+  delay = 1000  # ms delay after changes
+
+[log]
+  time = false
