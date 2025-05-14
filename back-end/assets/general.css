@@ -12,6 +12,15 @@ body {
   font-family: "Poppins", sans-serif;
 }
 
+h1,
+h4,
+label,
+p,
+li {
+  color: white;
+  font-weight: bold;
+}
+
 nav {
   background-color: var(--verde-oscuro);
   opacity: 0.85;

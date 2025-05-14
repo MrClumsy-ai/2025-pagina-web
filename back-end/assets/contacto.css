@@ -2,15 +2,6 @@
   color: white;
 }
 
-h1,
-h4,
-label,
-p,
-li {
-  color: white;
-  font-weight: bold;
-}
-
 form input,
 form textarea {
   border-radius: 20px;
@@ -57,4 +48,3 @@ ul.list-unstyled li a:hover {
   text-decoration: underline;
   color: white;
 }
-

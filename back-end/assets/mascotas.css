@@ -8,6 +8,10 @@ main h2 {
   margin-bottom: 50px;
 }
 
+main li {
+  color: black;
+}
+
 article {
   background-color: var(--blanco);
   margin-bottom: 25px;
