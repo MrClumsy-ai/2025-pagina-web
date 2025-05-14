@@ -2,10 +2,12 @@ package main
 
 import (
 	"database/sql"
-	"encoding/base64"
+	"encoding/json"
+	"net/http"
+
+	// "encoding/base64"
 	"html/template"
 	"io"
-	"os"
 	"proweb-backend/database"
 
 	"github.com/labstack/echo/v4"
@@ -27,17 +29,8 @@ func newTemplate() *Templates {
 		templates: tmpl,
 	}
 }
-
-type Mascota struct {
-	Foto        []byte
-	Foto64      string
-	Nombre      string
-	Edad        int
-	Altura      int
-	Descripcion string
-}
-
 func main() {
+	// init
 	e := echo.New()
 	e.Static("/assets", "assets")
 	e.Renderer = newTemplate()
@@ -52,52 +45,52 @@ func main() {
 		e.Logger.Fatal("error creating mascota table: ", err)
 	}
 
-	var mascotas []Mascota
-
 	e.GET("/", func(c echo.Context) error {
-		foto, err := os.ReadFile("assets/img/splash.jpg")
+		/* foto, err := os.ReadFile("assets/img/splash.jpg")
 		if err != nil {
 			e.Logger.Fatal("failed to load file")
 		}
-		base64str := base64.StdEncoding.EncodeToString(foto)
+		base64str := base64.StdEncoding.EncodeToString(foto) */
 		e.Logger.Printf("retrieved file")
-		// test
-		mascotas = []Mascota{
-			{Foto64: base64str, Nombre: "lorem", Edad: 1, Altura: 23, Descripcion: "lorem ipsum lalalala"},
-			{Foto64: base64str, Nombre: "ipsum", Edad: 2, Altura: 12, Descripcion: "lorem ipsum lalalala"},
-			{Foto64: base64str, Nombre: "something", Edad: 3, Altura: 34, Descripcion: "lorem ipsum lalalala"},
-		}
 		response := map[string]any{
 			"CurrentRoute": "/",
-			"Mascotas":     mascotas,
+			"Mascotas":     nil,
 		}
-		return c.Render(200, "inicio", response)
+		return c.Render(http.StatusOK, "inicio", response)
 	})
 
 	e.GET("/adopcion", func(c echo.Context) error {
 		response := map[string]any{
 			"CurrentRoute": "/adopcion",
 		}
-		return c.Render(200, "adopcion", response)
+		return c.Render(http.StatusOK, "adopcion", response)
 	})
 
 	e.GET("/mascotas", func(c echo.Context) error {
 		response := map[string]any{
 			"CurrentRoute": "/mascotas",
-			"Mascotas":     mascotas,
+			"Mascotas":     nil,
 		}
-		return c.Render(200, "mascotas", response)
+		return c.Render(http.StatusOK, "mascotas", response)
 	})
 
 	e.GET("/contacto", func(c echo.Context) error {
 		response := map[string]any{
 			"CurrentRoute": "/contacto",
 		}
-		return c.Render(200, "contacto", response)
+		return c.Render(http.StatusOK, "contacto", response)
 	})
 
 	e.GET("/api/mascotas", func(c echo.Context) error {
-		return nil
+		res, err := mascotaRepository.GetAll()
+		if err != nil {
+			e.Logger.Fatal("error getting all", err)
+			return c.JSON(http.StatusInternalServerError, err)
+		}
+		r, err := json.Marshal(res)
+		e.Logger.Printf("%v", r)
+		return c.JSON(http.StatusOK, r)
 	})
+
 	e.Logger.Fatal(e.Start(":8000"))
 }
