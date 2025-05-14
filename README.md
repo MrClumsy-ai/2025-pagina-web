@@ -1,9 +1,24 @@
 # TODO
 
-- [ ] bug con multiples mascotas, solo pone el modal de la primera
-- [ ] crear base de datos sqlite3
-- [ ] agregar contacto
-- [ ] agregar texto a contacto
+- [ ] que hace el boton de "solicitar adopcion"?
+
+## Para iniciar el servidor:
+
+1. Instalar golang: https://go.dev/doc/install
+2. Ir al directorio en una terminal e instalar todos los paquetes del proyecto
+
+```
+cd ubicacion/del/proyecto
+go mod tidy
+```
+
+3. Correr el servidor con go run
+
+```
+go run main.go
+```
+
+4. Ir a la ubicacion desde un navegador web: http://localhost:8000/
 
 ## Para trabajar
 
