@@ -3,6 +3,7 @@ package main
 import (
 	"database/sql"
 	"encoding/base64"
+	"fmt"
 	"net/http"
 	"strconv"
 
@@ -85,10 +86,21 @@ func main() {
 
 	// routes
 	e.GET("/", func(c echo.Context) error {
-		mascotas, err := getMascotas()
+		rows, err := dbConnection.Query("SELECT * FROM mascotas LIMIT 3")
 		if err != nil {
-			e.Logger.Fatal(err)
-			c.HTML(http.StatusInternalServerError, "<h1>Internal server error!</h1>")
+			e.Logger.Error(err)
+			return c.HTML(http.StatusInternalServerError, "<h1>500: Internal server error</h1>")
+		}
+		defer rows.Close()
+		var mascotas Mascotas
+		for rows.Next() {
+			var mascota Mascota
+			err := rows.Scan(&mascota.Id, &mascota.Nombre, &mascota.Edad, &mascota.Altura_cm, &mascota.Foto64, &mascota.Descripcion)
+			if err != nil {
+				e.Logger.Error(err)
+				return c.HTML(http.StatusInternalServerError, "<h1>500: Internal server error</h1>")
+			}
+			mascotas = append(mascotas, mascota)
 		}
 		response := map[string]any{
 			"CurrentRoute": "/",
@@ -105,8 +117,14 @@ func main() {
 	})
 
 	e.GET("/mascotas", func(c echo.Context) error {
+		mascotas, err := getMascotas()
+		if err != nil {
+			e.Logger.Error(err)
+			c.HTML(http.StatusInternalServerError, "<h1>Internal server error</h1>")
+		}
 		response := map[string]any{
 			"CurrentRoute": "/mascotas",
+			"Mascotas":     mascotas,
 		}
 		return c.Render(http.StatusOK, "mascotas", response)
 	})
@@ -119,15 +137,18 @@ func main() {
 	})
 
 	e.GET("/registrar", func(c echo.Context) error {
-		return c.Render(http.StatusOK, "registrar", nil)
+		response := map[string]any{
+			"CurrentRoute": "/registrar",
+		}
+		return c.Render(http.StatusOK, "registrar", response)
 	})
 
 	// API
 	e.GET("/api/mascotas", func(c echo.Context) error {
 		mascotas, err := getMascotas()
 		if err != nil {
-			c.JSON(http.StatusInternalServerError, nil)
 			e.Logger.Fatal(err)
+			return c.JSON(http.StatusInternalServerError, nil)
 		}
 		if len(mascotas) == 0 {
 			return c.JSON(http.StatusNotFound, nil)
@@ -139,11 +160,12 @@ func main() {
 		var mascota Mascota
 		pId, err := strconv.Atoi(c.Param("id"))
 		if err != nil {
-			e.Logger.Fatal(err)
+			e.Logger.Error(err)
 			return c.JSON(http.StatusInternalServerError, nil)
 		}
 		err = dbConnection.QueryRow("SELECT * FROM mascotas WHERE ID = ?", pId).Scan(&mascota.Id, &mascota.Nombre, &mascota.Edad, &mascota.Altura_cm, &mascota.Foto64, &mascota.Descripcion)
 		if err != nil {
+			e.Logger.Error(err)
 			return c.JSON(http.StatusNotFound, "mascota not found")
 		}
 		return c.JSON(http.StatusFound, mascota)
@@ -160,12 +182,14 @@ func main() {
 		}
 		src, err := foto.Open()
 		if err != nil {
-			e.Logger.Fatal(err)
+			e.Logger.Error(err)
+			return c.HTML(http.StatusInternalServerError, "<h1>500: Internal server error</h1>")
 		}
 		defer src.Close()
 		fotoBytes, err := io.ReadAll(src)
 		if err != nil {
-			e.Logger.Fatal(err)
+			e.Logger.Error(err)
+			return c.HTML(http.StatusInternalServerError, "<h1>500: Internal server error</h1>")
 		}
 		foto64 := base64.StdEncoding.EncodeToString(fotoBytes)
 		reqBody := Mascota{
@@ -175,22 +199,20 @@ func main() {
 			Descripcion: descripcion,
 			Foto64:      foto64,
 		}
-		e.Logger.Printf("request body: %v", reqBody)
 		if err := c.Bind(&reqBody); err != nil {
-			return c.JSON(http.StatusBadRequest, "Bad request")
+			return c.HTML(http.StatusBadRequest, "<h1>Bad request</h1>")
 		}
-		e.Logger.Printf("request body: %v", reqBody)
 		if reqBody.Nombre == "" {
-			return c.JSON(http.StatusBadRequest, "Ningun nombre dado")
+			return c.HTML(http.StatusBadRequest, "<h1>Ningun nombre dado</h1>")
 		}
 		_, err = dbConnection.Exec("INSERT INTO mascotas (nombre, edad, altura_cm, foto64, descripcion) VALUES (?, ?, ?, ?, ?)",
 			reqBody.Nombre, reqBody.Edad, reqBody.Altura_cm, reqBody.Foto64, reqBody.Descripcion)
 		if err != nil {
-			e.Logger.Fatal(err)
-			return c.JSON(http.StatusInternalServerError, nil)
+			e.Logger.Error(err)
+			return c.HTML(http.StatusInternalServerError, "<h1>500: Internal server error</h1>")
 		}
-		e.Logger.Printf("inserted into db: %v", reqBody)
-		return c.JSON(http.StatusCreated, reqBody)
+		e.Logger.Printf("inserted into db: %v", reqBody.Nombre)
+		return c.Render(http.StatusCreated, "registrado", reqBody)
 	})
 
 	e.Logger.Fatal(e.Start(":" + PORT))

@@ -1,4 +1,4 @@
-{{ define "registrar" }}
+{{ define "registrado" }}
 <!doctype html>
 <html lang="es">
   <head>
@@ -20,29 +20,10 @@
     <!-- Bootstrap5: JavaScript -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
     <link rel="stylesheet" href="/assets/general.css" />
-    <link rel="stylesheet" href="/assets/registrar.css" />
   </head>
   <body>
     {{ template "navbar" . }}
     <main class="container-fluid" style="margin-top: 80px">
-      <form action="http://localhost:8000/api/mascotas" method="post" enctype="multipart/form-data">
-        <label for="nombre">Nombre: </label>
-        <input name="nombre" type="text" placeholder="nombre" required /> <br />
-
-        <label for="edad">Edad: </label>
-        <input name="edad" type="number" placeholder="edad" /> <br />
-
-        <label for="altura">Altura (cm): </label>
-        <input name="altura" type="number" placeholder="altura" /> <br />
-
-        <label for="foto">Foto: </label>
-        <input name="foto" type="file" accept="image/*" required /> <br />
-        
-        <label for="descripcion">Descripcion: </label>
-        <input name="descripcion" type="text" placeholder="descripcion" /> <br />
-
-        <button type="submit">submit</button>
-      </form>
     </main>
   </body>
 </html>
