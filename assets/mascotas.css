@@ -41,8 +41,15 @@ article button {
   top: 35%;
 }
 
-.modal-mascota {
+.flex {
+  display: flex;
+}
+
+.hidden {
   display: none;
+}
+
+.modal-mascota {
   position: fixed;
   z-index: 1000;
   left: 0;

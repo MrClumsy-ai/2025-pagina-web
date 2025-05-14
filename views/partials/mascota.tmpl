@@ -9,12 +9,12 @@
         <li>Edad: {{ .Edad }} anios</li>
         <li>Altura: {{ .Altura_cm }}cm</li>
       </ul>
-      <button class="p-4 rounded-pill" type="button" onclick="mostrarModal()">Ver Detalles</button>
+      <button class="p-4 rounded-pill ver-detalles" type="button">Ver Detalles</button>
     </div>
   </article>
-  <div id="detalleMascota" class="modal-mascota" style="display: none;">
+  <div class="modal-mascota hidden" >
     <div class="modal-content">
-      <span class="close-btn" onclick="cerrarModal()">&times;</span>
+      <span class="close-btn ocultar-detalles">&times;</span>
       <img src="data:image/jpeg;base64,{{ .Foto64 }}" alt="Foto de la mascota" />
       <h2>{{ .Nombre }}</h2>
       <p><strong>Edad:</strong> {{ .Edad  }} años</p>
