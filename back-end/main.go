@@ -2,6 +2,7 @@ package main
 
 import (
 	"database/sql"
+	"encoding/base64"
 	"net/http"
 	"strconv"
 
@@ -10,6 +11,7 @@ import (
 
 	"github.com/labstack/echo/v4"
 	_ "github.com/mattn/go-sqlite3"
+	"golang.org/x/net/context/ctxhttp"
 )
 
 const PORT = "8000"
@@ -19,13 +21,13 @@ type Templates struct {
 }
 
 type Mascota struct {
-	Id          int
-	Nombre      string
-	Edad        int
-	Altura_cm   int
-	Foto        []byte
-	Foto64      string
-	Descripcion string
+	Id          int    `form:"id" json:"id"`
+	Nombre      string `form:"nombre" json:"nombre"`
+	Edad        int    `form:"edad" json:"edad"`
+	Altura_cm   int    `form:"altura" json:"altura"`
+	Foto        []byte `form:"foto" json:"foto"`
+	Foto64      string `form:"foto64" json:"foto64"`
+	Descripcion string `form:"descripcion" json:"descripcion"`
 }
 
 type Mascotas []Mascota
@@ -53,7 +55,7 @@ func main() {
 	defer dbConnection.Close()
 	_, err = dbConnection.Exec(`CREATE TABLE IF NOT EXISTS mascotas (
 		id INTEGER PRIMARY KEY AUTOINCREMENT,
-		nombre TEXT,
+		nombre TEXT NOT NULL,
 		edad INTEGER,
 		altura_cm INTEGER,
 		foto BLOB,
@@ -63,7 +65,6 @@ func main() {
 	}
 
 	e.GET("/", func(c echo.Context) error {
-		e.Logger.Printf("retrieved file")
 		response := map[string]any{
 			"CurrentRoute": "/",
 			"Mascotas":     nil,
@@ -91,6 +92,10 @@ func main() {
 			"CurrentRoute": "/contacto",
 		}
 		return c.Render(http.StatusOK, "contacto", response)
+	})
+
+	e.GET("/registrar", func(c echo.Context) error {
+		return c.Render(http.StatusOK, "registrar", nil)
 	})
 
 	// API
@@ -133,21 +138,47 @@ func main() {
 	})
 
 	e.POST("/api/mascotas", func(c echo.Context) error {
-		var reqBody Mascota
+		// c.Request().ParseMultipartForm(10 << 20)
+		nombre := c.FormValue("nombre")
+		edad, err := strconv.Atoi(c.FormValue("edad"))
+		altura, err := strconv.Atoi(c.FormValue("altura"))
+		descripcion := c.FormValue("descripcion")
+		foto, err := c.FormFile("foto")
+		if err != nil {
+			e.Logger.Fatal(err)
+		}
+		fotoContenido, err := foto.Open()
+		if err != nil {
+			e.Logger.Fatal(err)
+		}
+		defer fotoContenido.Close()
+		fotoBytes, err := io.ReadAll(fotoContenido)
+		if err != nil {
+			e.Logger.Fatal(err)
+		}
+		reqBody := Mascota{
+			Nombre:      nombre,
+			Edad:        edad,
+			Altura_cm:   altura,
+			Descripcion: descripcion,
+			Foto:        fotoBytes,
+		}
+		e.Logger.Printf("request body: %v", reqBody)
 		if err := c.Bind(&reqBody); err != nil {
 			return c.JSON(http.StatusBadRequest, "Bad request")
 		}
 		e.Logger.Printf("request body: %v", reqBody)
 		if reqBody.Nombre == "" {
-			return c.JSON(http.StatusBadRequest, "No name given")
+			return c.JSON(http.StatusBadRequest, "Ningun nombre dado")
 		}
-		_, err = dbConnection.Exec("INSERT INTO mascotas (name) VALUES (?)", reqBody.Name)
+		_, err = dbConnection.Exec("INSERT INTO mascotas (nombre, edad, altura_cm, foto, descripcion) VALUES (?, ?, ?, ?, ?)",
+			reqBody.Nombre, reqBody.Edad, reqBody.Altura_cm, reqBody.Foto, reqBody.Descripcion)
 		if err != nil {
 			e.Logger.Fatal(err)
 			return c.JSON(http.StatusInternalServerError, nil)
 		}
-		log.Println("inserted into db")
-		return c.JSON(http.StatusCreated, reqBody.Name)
+		e.Logger.Printf("inserted into db: %v", reqBody)
+		return c.JSON(http.StatusCreated, reqBody)
 	})
 
 	/* foto, err := os.ReadFile("assets/img/splash.jpg")
