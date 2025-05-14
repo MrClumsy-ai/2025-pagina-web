@@ -2,6 +2,7 @@ package main
 
 import (
 	"database/sql"
+	"encoding/base64"
 	"net/http"
 	"strconv"
 
@@ -23,7 +24,7 @@ type Mascota struct {
 	Nombre      string `form:"nombre" json:"nombre"`
 	Edad        int    `form:"edad" json:"edad"`
 	Altura_cm   int    `form:"altura" json:"altura"`
-	Foto        []byte `form:"foto" json:"foto"`
+	Foto64      string `form:"foto64" json:"foto64"`
 	Descripcion string `form:"descripcion" json:"descripcion"`
 }
 
@@ -55,7 +56,7 @@ func main() {
 		nombre TEXT NOT NULL,
 		edad INTEGER,
 		altura_cm INTEGER,
-		foto BLOB,
+		foto64 BLOB,
 		descripcion TEXT)`)
 	if err != nil {
 		e.Logger.Fatal("error creating mascota table", err)
@@ -70,7 +71,7 @@ func main() {
 		var mascotas Mascotas
 		for rows.Next() {
 			var mascota Mascota
-			err := rows.Scan(&mascota.Id, &mascota.Nombre, &mascota.Edad, &mascota.Altura_cm, &mascota.Foto, &mascota.Descripcion)
+			err := rows.Scan(&mascota.Id, &mascota.Nombre, &mascota.Edad, &mascota.Altura_cm, &mascota.Foto64, &mascota.Descripcion)
 			if err != nil {
 				return nil, err
 			}
@@ -122,7 +123,6 @@ func main() {
 	})
 
 	// API
-
 	e.GET("/api/mascotas", func(c echo.Context) error {
 		mascotas, err := getMascotas()
 		if err != nil {
@@ -142,7 +142,7 @@ func main() {
 			e.Logger.Fatal(err)
 			return c.JSON(http.StatusInternalServerError, nil)
 		}
-		err = dbConnection.QueryRow("SELECT * FROM mascotas WHERE ID = ?", pId).Scan(&mascota.Id, &mascota.Nombre, &mascota.Edad, &mascota.Altura_cm, &mascota.Foto, &mascota.Descripcion)
+		err = dbConnection.QueryRow("SELECT * FROM mascotas WHERE ID = ?", pId).Scan(&mascota.Id, &mascota.Nombre, &mascota.Edad, &mascota.Altura_cm, &mascota.Foto64, &mascota.Descripcion)
 		if err != nil {
 			return c.JSON(http.StatusNotFound, "mascota not found")
 		}
@@ -156,7 +156,7 @@ func main() {
 		descripcion := c.FormValue("descripcion")
 		foto, err := c.FormFile("foto")
 		if err != nil {
-			e.Logger.Fatal(err)
+			return c.HTML(http.StatusBadRequest, "<h1>400: Bad request</h1>")
 		}
 		src, err := foto.Open()
 		if err != nil {
@@ -167,12 +167,13 @@ func main() {
 		if err != nil {
 			e.Logger.Fatal(err)
 		}
+		foto64 := base64.StdEncoding.EncodeToString(fotoBytes)
 		reqBody := Mascota{
 			Nombre:      nombre,
 			Edad:        edad,
 			Altura_cm:   altura,
 			Descripcion: descripcion,
-			Foto:        fotoBytes,
+			Foto64:      foto64,
 		}
 		e.Logger.Printf("request body: %v", reqBody)
 		if err := c.Bind(&reqBody); err != nil {
@@ -182,8 +183,8 @@ func main() {
 		if reqBody.Nombre == "" {
 			return c.JSON(http.StatusBadRequest, "Ningun nombre dado")
 		}
-		_, err = dbConnection.Exec("INSERT INTO mascotas (nombre, edad, altura_cm, foto, descripcion) VALUES (?, ?, ?, ?, ?)",
-			reqBody.Nombre, reqBody.Edad, reqBody.Altura_cm, reqBody.Foto, reqBody.Descripcion)
+		_, err = dbConnection.Exec("INSERT INTO mascotas (nombre, edad, altura_cm, foto64, descripcion) VALUES (?, ?, ?, ?, ?)",
+			reqBody.Nombre, reqBody.Edad, reqBody.Altura_cm, reqBody.Foto64, reqBody.Descripcion)
 		if err != nil {
 			e.Logger.Fatal(err)
 			return c.JSON(http.StatusInternalServerError, nil)

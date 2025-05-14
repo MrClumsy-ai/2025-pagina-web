@@ -2,7 +2,7 @@
 {{ range .Mascotas}}
 <div>
   <article class="container rounded-5 p-5">
-    <img src="data:image/jpeg;base64,{{ .Foto }}" alt="Foto de la mascota" />
+    <img src="data:image/jpeg;base64,{{ .Foto64 }}" alt="Foto de la mascota" />
     <div>
       <h3>{{ .Nombre }}</h3>
       <ul>
@@ -15,7 +15,7 @@
   <div id="detalleMascota" class="modal-mascota" style="display: none;">
     <div class="modal-content">
       <span class="close-btn" onclick="cerrarModal()">&times;</span>
-      <img src="data:image/jpeg;base64,{{ .Foto }}" alt="Foto de la mascota" />
+      <img src="data:image/jpeg;base64,{{ .Foto64 }}" alt="Foto de la mascota" />
       <h2>{{ .Nombre }}</h2>
       <p><strong>Edad:</strong> {{ .Edad  }} años</p>
       <p><strong>Altura:</strong> {{ .Altura_cm }}cm</p>
