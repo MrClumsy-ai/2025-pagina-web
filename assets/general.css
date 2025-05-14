@@ -33,7 +33,8 @@ hr {
   opacity: 1;
 }
 
-button {
+button,
+.button {
   width: 250px;
   color: var(--negro);
   font-weight: bold;
@@ -41,10 +42,13 @@ button {
   border: none;
   transition-duration: 0.2s;
   box-shadow: 2px 2px var(--negro);
+  text-decoration: none;
 }
 
-button:hover {
+button:hover,
+.button:hover {
   color: white;
   background-color: var(--verde-oscuro);
   box-shadow: 2px 2px var(--negro);
+  text-decoration: none;
 }

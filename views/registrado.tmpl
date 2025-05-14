@@ -11,6 +11,12 @@
   <body>
     {{ template "navbar" . }}
     <main class="container-fluid" style="margin-top: 80px">
+      <div class="container">
+        <h1>{{ .ReqBody.Nombre }} registrado!</h1>
+        <div style="margin-top: 100px;">
+          <a class="p-4 rounded-pill button" href="http://localhost:8000/" >Regresar al menu principal</a>
+        </div>
+      </div>
     </main>
   </body>
 </html>

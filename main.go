@@ -211,7 +211,11 @@ func main() {
 			return c.HTML(http.StatusInternalServerError, "<h1>500: Internal server error</h1>")
 		}
 		e.Logger.Printf("inserted into db: %v", reqBody.Nombre)
-		return c.Render(http.StatusCreated, "registrado", reqBody)
+		response := map[string]any{
+			"CurrentRoute": "/registrar",
+			"ReqBody":      reqBody,
+		}
+		return c.Render(http.StatusCreated, "registrado", response)
 	})
 
 	e.Logger.Fatal(e.Start(":" + PORT))
