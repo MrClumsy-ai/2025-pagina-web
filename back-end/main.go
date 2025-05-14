@@ -6,6 +6,7 @@ import (
 	"html/template"
 	"io"
 	"os"
+	"proweb-backend/database"
 
 	"github.com/labstack/echo/v4"
 	_ "github.com/mattn/go-sqlite3"
@@ -45,6 +46,11 @@ func main() {
 		e.Logger.Fatal("error connecting to db: ", err)
 	}
 	defer dbConnection.Close()
+	mascotaRepository := &database.MascotaRepository{Db: dbConnection}
+	err = mascotaRepository.CreateTable()
+	if err != nil {
+		e.Logger.Fatal("error creating mascota table: ", err)
+	}
 
 	var mascotas []Mascota
 
@@ -88,6 +94,10 @@ func main() {
 			"CurrentRoute": "/contacto",
 		}
 		return c.Render(200, "contacto", response)
+	})
+
+	e.GET("/api/mascotas", func(c echo.Context) error {
+		return nil
 	})
 	e.Logger.Fatal(e.Start(":8000"))
 }
