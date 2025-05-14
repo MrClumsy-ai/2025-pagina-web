@@ -2,7 +2,6 @@ package main
 
 import (
 	"database/sql"
-	"encoding/base64"
 	"net/http"
 	"strconv"
 
@@ -11,7 +10,6 @@ import (
 
 	"github.com/labstack/echo/v4"
 	_ "github.com/mattn/go-sqlite3"
-	"golang.org/x/net/context/ctxhttp"
 )
 
 const PORT = "8000"
@@ -26,7 +24,6 @@ type Mascota struct {
 	Edad        int    `form:"edad" json:"edad"`
 	Altura_cm   int    `form:"altura" json:"altura"`
 	Foto        []byte `form:"foto" json:"foto"`
-	Foto64      string `form:"foto64" json:"foto64"`
 	Descripcion string `form:"descripcion" json:"descripcion"`
 }
 
@@ -64,10 +61,37 @@ func main() {
 		e.Logger.Fatal("error creating mascota table", err)
 	}
 
+	getMascotas := func() (Mascotas, error) {
+		rows, err := dbConnection.Query("SELECT * FROM mascotas")
+		if err != nil {
+			return nil, err
+		}
+		defer rows.Close()
+		var mascotas Mascotas
+		for rows.Next() {
+			var mascota Mascota
+			err := rows.Scan(&mascota.Id, &mascota.Nombre, &mascota.Edad, &mascota.Altura_cm, &mascota.Foto, &mascota.Descripcion)
+			if err != nil {
+				return nil, err
+			}
+			mascotas = append(mascotas, mascota)
+		}
+		if len(mascotas) == 0 {
+			return Mascotas{}, nil
+		}
+		return mascotas, nil
+	}
+
+	// routes
 	e.GET("/", func(c echo.Context) error {
+		mascotas, err := getMascotas()
+		if err != nil {
+			e.Logger.Fatal(err)
+			c.HTML(http.StatusInternalServerError, "<h1>Internal server error!</h1>")
+		}
 		response := map[string]any{
 			"CurrentRoute": "/",
-			"Mascotas":     nil,
+			"Mascotas":     mascotas,
 		}
 		return c.Render(http.StatusOK, "inicio", response)
 	})
@@ -82,7 +106,6 @@ func main() {
 	e.GET("/mascotas", func(c echo.Context) error {
 		response := map[string]any{
 			"CurrentRoute": "/mascotas",
-			"Mascotas":     nil,
 		}
 		return c.Render(http.StatusOK, "mascotas", response)
 	})
@@ -101,21 +124,10 @@ func main() {
 	// API
 
 	e.GET("/api/mascotas", func(c echo.Context) error {
-		rows, err := dbConnection.Query("SELECT * FROM mascotas")
+		mascotas, err := getMascotas()
 		if err != nil {
+			c.JSON(http.StatusInternalServerError, nil)
 			e.Logger.Fatal(err)
-			return c.JSON(http.StatusInternalServerError, nil)
-		}
-		defer rows.Close()
-		var mascotas Mascotas
-		for rows.Next() {
-			var mascota Mascota
-			err := rows.Scan(&mascota.Id, &mascota.Nombre, &mascota.Edad, &mascota.Altura_cm, &mascota.Foto, &mascota.Descripcion)
-			if err != nil {
-				e.Logger.Fatal(err)
-				return c.JSON(http.StatusInternalServerError, nil)
-			}
-			mascotas = append(mascotas, mascota)
 		}
 		if len(mascotas) == 0 {
 			return c.JSON(http.StatusNotFound, nil)
@@ -138,7 +150,6 @@ func main() {
 	})
 
 	e.POST("/api/mascotas", func(c echo.Context) error {
-		// c.Request().ParseMultipartForm(10 << 20)
 		nombre := c.FormValue("nombre")
 		edad, err := strconv.Atoi(c.FormValue("edad"))
 		altura, err := strconv.Atoi(c.FormValue("altura"))
@@ -147,12 +158,12 @@ func main() {
 		if err != nil {
 			e.Logger.Fatal(err)
 		}
-		fotoContenido, err := foto.Open()
+		src, err := foto.Open()
 		if err != nil {
 			e.Logger.Fatal(err)
 		}
-		defer fotoContenido.Close()
-		fotoBytes, err := io.ReadAll(fotoContenido)
+		defer src.Close()
+		fotoBytes, err := io.ReadAll(src)
 		if err != nil {
 			e.Logger.Fatal(err)
 		}
@@ -180,12 +191,6 @@ func main() {
 		e.Logger.Printf("inserted into db: %v", reqBody)
 		return c.JSON(http.StatusCreated, reqBody)
 	})
-
-	/* foto, err := os.ReadFile("assets/img/splash.jpg")
-	if err != nil {
-		e.Logger.Fatal("failed to load file")
-	}
-	base64str := base64.StdEncoding.EncodeToString(foto) */
 
 	e.Logger.Fatal(e.Start(":" + PORT))
 }
