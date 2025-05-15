@@ -11,9 +11,7 @@ document.addEventListener("DOMContentLoaded", () => {
   });
   ocultarDetalles.forEach((button) => {
     button.addEventListener("click", () => {
-      const targetDiv = button
-        .closest(".modal-mascota")
-        .classList.replace("flex", "hidden");
+      button.closest(".modal-mascota").classList.replace("flex", "hidden");
     });
   });
 });
