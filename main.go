@@ -14,6 +14,7 @@ import (
 )
 
 const PORT = "8000"
+const URL = "http://localhost:" + PORT
 
 type Templates struct {
 	templates *template.Template
@@ -102,6 +103,7 @@ func main() {
 			mascotas = append(mascotas, mascota)
 		}
 		response := map[string]any{
+			"URL":          URL,
 			"CurrentRoute": "/",
 			"Mascotas":     mascotas,
 		}
@@ -110,6 +112,7 @@ func main() {
 
 	e.GET("/adopcion", func(c echo.Context) error {
 		response := map[string]any{
+			"URL":          URL,
 			"CurrentRoute": "/adopcion",
 		}
 		return c.Render(http.StatusOK, "adopcion", response)
@@ -122,6 +125,7 @@ func main() {
 			c.HTML(http.StatusInternalServerError, "<h1>Internal server error</h1>")
 		}
 		response := map[string]any{
+			"URL":          URL,
 			"CurrentRoute": "/mascotas",
 			"Mascotas":     mascotas,
 		}
@@ -130,6 +134,7 @@ func main() {
 
 	e.GET("/contacto", func(c echo.Context) error {
 		response := map[string]any{
+			"URL":          URL,
 			"CurrentRoute": "/contacto",
 		}
 		return c.Render(http.StatusOK, "contacto", response)
@@ -137,6 +142,7 @@ func main() {
 
 	e.GET("/registrar", func(c echo.Context) error {
 		response := map[string]any{
+			"URL":          URL,
 			"CurrentRoute": "/registrar",
 		}
 		return c.Render(http.StatusOK, "registrar", response)
@@ -212,6 +218,7 @@ func main() {
 		}
 		e.Logger.Printf("inserted into db: %v", reqBody.Nombre)
 		response := map[string]any{
+			"URL":          URL,
 			"CurrentRoute": "/registrar",
 			"ReqBody":      reqBody,
 		}

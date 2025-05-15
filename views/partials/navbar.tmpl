@@ -1,7 +1,7 @@
 {{ define "navbar" }}
 <nav class="navbar navbar-expand-sm navbar-dark fixed-top">
   <div class="container-fluid">
-    <a class="navbar-brand" href="http://localhost:8000/">
+    <a class="navbar-brand" href="{{ .URL }}/">
       <!-- cambiar para hacer el logo real -->
       <img
         src="assets/img/favicon.ico"
@@ -16,19 +16,19 @@
     <div class="collapse navbar-collapse" id="mynavbar">
       <ul class="navbar-nav ms-auto">
         <li class="nav-item">
-          <a class="nav-link {{ if eq .CurrentRoute "/" }}active{{ end }}" href="http://localhost:8000/">Inicio</a>
+          <a class="nav-link {{ if eq .CurrentRoute "/" }}active{{ end }}" href="{{ .URL }}/">Inicio</a>
         </li>
         <li class="nav-item">
-          <a class="nav-link {{ if eq .CurrentRoute "/adopcion" }}active{{ end }}" href="http://localhost:8000/adopcion">Adopcion</a>
+          <a class="nav-link {{ if eq .CurrentRoute "/adopcion" }}active{{ end }}" href="{{ .URL }}/adopcion">Adopcion</a>
         </li>
         <li class="nav-item">
-          <a class="nav-link {{ if eq .CurrentRoute "/mascotas" }}active{{ end }}" href="http://localhost:8000/mascotas">Mascotas</a>
+          <a class="nav-link {{ if eq .CurrentRoute "/mascotas" }}active{{ end }}" href="{{ .URL }}/mascotas">Mascotas</a>
         </li>
         <li class="nav-item">
-          <a class="nav-link {{ if eq .CurrentRoute "/contacto" }}active{{ end }}" href="http://localhost:8000/contacto">Contacto</a>
+          <a class="nav-link {{ if eq .CurrentRoute "/contacto" }}active{{ end }}" href="{{ .URL }}/contacto">Contacto</a>
         </li>
         <li class="nav-item">
-          <a class="nav-link {{ if eq .CurrentRoute "/registrar" }}active{{ end }}" href="http://localhost:8000/registrar">Registrar</a>
+          <a class="nav-link {{ if eq .CurrentRoute "/registrar" }}active{{ end }}" href="{{ .URL }}/registrar">Registrar</a>
         </li>
       </ul>
     </div>
