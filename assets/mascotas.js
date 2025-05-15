@@ -1,6 +1,6 @@
 document.addEventListener("DOMContentLoaded", () => {
   const verDetalles = document.querySelectorAll(".ver-detalles");
-  const ocultarDetalles = document.querySelectorAll(".ocultar-detalles");
+  const ocultarDetalles = document.querySelectorAll(".close-btn");
   verDetalles.forEach((button) => {
     button.addEventListener("click", () => {
       const targetDiv = button.closest("article").nextElementSibling;
