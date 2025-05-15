@@ -33,7 +33,7 @@ hr {
   opacity: 1;
 }
 
-button,
+main button,
 .button {
   width: 250px;
   color: var(--negro);
@@ -45,7 +45,7 @@ button,
   text-decoration: none;
 }
 
-button:hover,
+main button:hover,
 .button:hover {
   color: white;
   background-color: var(--verde-oscuro);
