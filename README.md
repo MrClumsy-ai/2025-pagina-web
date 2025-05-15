@@ -1,6 +1,7 @@
 # TODO
 
 - [ ] que hace el boton de "solicitar adopcion"?
+- [ ] que hace contacto?
 
 ## Para iniciar el servidor:
 
@@ -19,6 +20,8 @@ go run main.go
 ```
 
 4. Ir a la ubicacion desde un navegador web: http://localhost:8000/
+
+5. Una vez que se hagan cambios, reiniciar el servidor, usando Ctrl + C en la linea de comandos y regresar al paso 3
 
 ## Para trabajar
 
