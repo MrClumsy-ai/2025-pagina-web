@@ -21,7 +21,7 @@
       <p><strong>Edad:</strong> {{ .Edad  }} años</p>
       <p><strong>Altura:</strong> {{ .Altura_cm }}cm</p>
       <p> {{ .Descripcion  }} </p>
-      <button class="adopt-btn">Solicitar adopción</button>
+      <a class="adopt-btn button" href="{{ $.URL }}/mascotas/{{ .Id }}">Solicitar adopción</a>
     </div>
   </div>
 </div>
