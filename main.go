@@ -153,6 +153,40 @@ func main() {
 		return c.Render(http.StatusOK, "mascotas", response)
 	})
 
+	e.GET("/mascotas/:id", func(c echo.Context) error {
+		e.Logger.Print("GET /mascotas/id")
+		var mascota Mascota
+		pId, err := strconv.Atoi(c.Param("id"))
+		if err != nil {
+			e.Logger.Error(err)
+			response := map[string]any{
+				"URL":     URL,
+				"Code":    http.StatusInternalServerError,
+				"Message": "Internal server error",
+			}
+			return c.Render(http.StatusInternalServerError, "error", response)
+		}
+		e.Logger.Printf("making db select")
+		err = dbConnection.QueryRow("SELECT * FROM mascotas WHERE ID = ?", pId).Scan(&mascota.Id, &mascota.Nombre, &mascota.Edad, &mascota.Altura_cm, &mascota.Foto64, &mascota.Descripcion)
+		if err != nil {
+			e.Logger.Error(err)
+			response := map[string]any{
+				"URL":     URL,
+				"Code":    http.StatusNotFound,
+				"Message": "Not found",
+			}
+			return c.Render(http.StatusInternalServerError, "error", response)
+		}
+		mascotas := Mascotas{mascota}
+		response := map[string]any{
+			"URL":          URL,
+			"CurrentRoute": "/mascotas",
+			"Mascotas":     mascotas,
+		}
+		e.Logger.Printf("mascotas: %v", mascotas)
+		return c.Render(http.StatusOK, "mascotas", response)
+	})
+
 	e.GET("/contacto", func(c echo.Context) error {
 		e.Logger.Print("GET /contacto")
 		response := map[string]any{
@@ -171,38 +205,8 @@ func main() {
 		return c.Render(http.StatusOK, "registrar", response)
 	})
 
-	// API
-	e.GET("/api/mascotas", func(c echo.Context) error {
-		e.Logger.Print("GET /api/mascotas")
-		mascotas, err := getMascotas()
-		if err != nil {
-			e.Logger.Fatal(err)
-			return c.JSON(http.StatusInternalServerError, nil)
-		}
-		if len(mascotas) == 0 {
-			return c.JSON(http.StatusNotFound, nil)
-		}
-		return c.JSON(http.StatusFound, mascotas)
-	})
-
-	e.GET("/api/mascotas/:id", func(c echo.Context) error {
-		e.Logger.Print("GET /api/mascotas/id")
-		var mascota Mascota
-		pId, err := strconv.Atoi(c.Param("id"))
-		if err != nil {
-			e.Logger.Error(err)
-			return c.JSON(http.StatusInternalServerError, nil)
-		}
-		err = dbConnection.QueryRow("SELECT * FROM mascotas WHERE ID = ?", pId).Scan(&mascota.Id, &mascota.Nombre, &mascota.Edad, &mascota.Altura_cm, &mascota.Foto64, &mascota.Descripcion)
-		if err != nil {
-			e.Logger.Error(err)
-			return c.JSON(http.StatusNotFound, "mascota not found")
-		}
-		return c.JSON(http.StatusFound, mascota)
-	})
-
-	e.POST("/api/mascotas", func(c echo.Context) error {
-		e.Logger.Print("POST /api/mascotas")
+	e.POST("/registrar", func(c echo.Context) error {
+		e.Logger.Print("POST /registrar")
 		nombre := c.FormValue("nombre")
 		edad, err := strconv.Atoi(c.FormValue("edad"))
 		altura, err := strconv.Atoi(c.FormValue("altura"))
@@ -279,6 +283,36 @@ func main() {
 			"ReqBody":      reqBody,
 		}
 		return c.Render(http.StatusCreated, "registrado", response)
+	})
+
+	// JSON
+	e.GET("/api/mascotas", func(c echo.Context) error {
+		e.Logger.Print("GET /api/mascotas")
+		mascotas, err := getMascotas()
+		if err != nil {
+			e.Logger.Fatal(err)
+			return c.JSON(http.StatusInternalServerError, nil)
+		}
+		if len(mascotas) == 0 {
+			return c.JSON(http.StatusNotFound, nil)
+		}
+		return c.JSON(http.StatusFound, mascotas)
+	})
+
+	e.GET("/api/mascotas/:id", func(c echo.Context) error {
+		e.Logger.Print("GET /api/mascotas/id")
+		var mascota Mascota
+		pId, err := strconv.Atoi(c.Param("id"))
+		if err != nil {
+			e.Logger.Error(err)
+			return c.JSON(http.StatusInternalServerError, nil)
+		}
+		err = dbConnection.QueryRow("SELECT * FROM mascotas WHERE ID = ?", pId).Scan(&mascota.Id, &mascota.Nombre, &mascota.Edad, &mascota.Altura_cm, &mascota.Foto64, &mascota.Descripcion)
+		if err != nil {
+			e.Logger.Error(err)
+			return c.JSON(http.StatusNotFound, "mascota not found")
+		}
+		return c.JSON(http.StatusFound, mascota)
 	})
 
 	e.GET("/*", func(c echo.Context) error {
