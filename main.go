@@ -42,15 +42,18 @@ func newTemplate() *Templates {
 		templates: tmpl,
 	}
 }
+
 func main() {
 	// init
 	e := echo.New()
 	e.Static("/assets", "assets")
 	e.Renderer = newTemplate()
-	dbConnection, err := sql.Open("sqlite3", "pagina.db")
+	const dbLocation = "pagina.db"
+	dbConnection, err := sql.Open("sqlite3", dbLocation)
 	if err != nil {
-		e.Logger.Fatal("error connecting to db: ", err)
+		e.Logger.Fatal("Error connecting to %v: %v", dbLocation, err)
 	}
+	e.Logger.Printf("Database connection established: %v", dbLocation)
 	defer dbConnection.Close()
 	_, err = dbConnection.Exec(`CREATE TABLE IF NOT EXISTS mascotas (
 		id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -60,7 +63,7 @@ func main() {
 		foto64 BLOB,
 		descripcion TEXT)`)
 	if err != nil {
-		e.Logger.Fatal("error creating mascota table", err)
+		e.Logger.Fatal("Error creating mascota table", err)
 	}
 
 	getMascotas := func() (Mascotas, error) {
@@ -86,10 +89,16 @@ func main() {
 
 	// routes
 	e.GET("/", func(c echo.Context) error {
+		e.Logger.Print("GET /")
 		rows, err := dbConnection.Query("SELECT * FROM mascotas LIMIT 3")
 		if err != nil {
 			e.Logger.Error(err)
-			return c.HTML(http.StatusInternalServerError, "<h1>500: Internal server error</h1>")
+			response := map[string]any{
+				"URL":     URL,
+				"Code":    http.StatusInternalServerError,
+				"Message": "Internal server error",
+			}
+			return c.Render(http.StatusInternalServerError, "error", response)
 		}
 		defer rows.Close()
 		var mascotas Mascotas
@@ -98,7 +107,12 @@ func main() {
 			err := rows.Scan(&mascota.Id, &mascota.Nombre, &mascota.Edad, &mascota.Altura_cm, &mascota.Foto64, &mascota.Descripcion)
 			if err != nil {
 				e.Logger.Error(err)
-				return c.HTML(http.StatusInternalServerError, "<h1>500: Internal server error</h1>")
+				response := map[string]any{
+					"URL":     URL,
+					"Code":    http.StatusInternalServerError,
+					"Message": "Internal server error",
+				}
+				return c.Render(http.StatusInternalServerError, "error", response)
 			}
 			mascotas = append(mascotas, mascota)
 		}
@@ -111,6 +125,7 @@ func main() {
 	})
 
 	e.GET("/adopcion", func(c echo.Context) error {
+		e.Logger.Print("GET /adopcion")
 		response := map[string]any{
 			"URL":          URL,
 			"CurrentRoute": "/adopcion",
@@ -119,10 +134,16 @@ func main() {
 	})
 
 	e.GET("/mascotas", func(c echo.Context) error {
+		e.Logger.Print("GET /mascotas")
 		mascotas, err := getMascotas()
 		if err != nil {
 			e.Logger.Error(err)
-			c.HTML(http.StatusInternalServerError, "<h1>Internal server error</h1>")
+			response := map[string]any{
+				"URL":     URL,
+				"Code":    http.StatusInternalServerError,
+				"Message": "Internal server error",
+			}
+			return c.Render(http.StatusInternalServerError, "error", response)
 		}
 		response := map[string]any{
 			"URL":          URL,
@@ -133,6 +154,7 @@ func main() {
 	})
 
 	e.GET("/contacto", func(c echo.Context) error {
+		e.Logger.Print("GET /contacto")
 		response := map[string]any{
 			"URL":          URL,
 			"CurrentRoute": "/contacto",
@@ -141,6 +163,7 @@ func main() {
 	})
 
 	e.GET("/registrar", func(c echo.Context) error {
+		e.Logger.Print("GET /registrar")
 		response := map[string]any{
 			"URL":          URL,
 			"CurrentRoute": "/registrar",
@@ -150,6 +173,7 @@ func main() {
 
 	// API
 	e.GET("/api/mascotas", func(c echo.Context) error {
+		e.Logger.Print("GET /api/mascotas")
 		mascotas, err := getMascotas()
 		if err != nil {
 			e.Logger.Fatal(err)
@@ -162,6 +186,7 @@ func main() {
 	})
 
 	e.GET("/api/mascotas/:id", func(c echo.Context) error {
+		e.Logger.Print("GET /api/mascotas/id")
 		var mascota Mascota
 		pId, err := strconv.Atoi(c.Param("id"))
 		if err != nil {
@@ -177,24 +202,40 @@ func main() {
 	})
 
 	e.POST("/api/mascotas", func(c echo.Context) error {
+		e.Logger.Print("POST /api/mascotas")
 		nombre := c.FormValue("nombre")
 		edad, err := strconv.Atoi(c.FormValue("edad"))
 		altura, err := strconv.Atoi(c.FormValue("altura"))
 		descripcion := c.FormValue("descripcion")
 		foto, err := c.FormFile("foto")
 		if err != nil {
-			return c.HTML(http.StatusBadRequest, "<h1>400: Bad request</h1>")
+			response := map[string]any{
+				"URL":     URL,
+				"Code":    http.StatusBadRequest,
+				"Message": "Bad request",
+			}
+			return c.Render(http.StatusBadRequest, "error", response)
 		}
 		src, err := foto.Open()
 		if err != nil {
 			e.Logger.Error(err)
-			return c.HTML(http.StatusInternalServerError, "<h1>500: Internal server error</h1>")
+			response := map[string]any{
+				"URL":     URL,
+				"Code":    http.StatusInternalServerError,
+				"Message": "Internal server error",
+			}
+			return c.Render(http.StatusInternalServerError, "error", response)
 		}
 		defer src.Close()
 		fotoBytes, err := io.ReadAll(src)
 		if err != nil {
 			e.Logger.Error(err)
-			return c.HTML(http.StatusInternalServerError, "<h1>500: Internal server error</h1>")
+			response := map[string]any{
+				"URL":     URL,
+				"Code":    http.StatusInternalServerError,
+				"Message": "Internal server error",
+			}
+			return c.Render(http.StatusInternalServerError, "error", response)
 		}
 		foto64 := base64.StdEncoding.EncodeToString(fotoBytes)
 		reqBody := Mascota{
@@ -205,16 +246,31 @@ func main() {
 			Foto64:      foto64,
 		}
 		if err := c.Bind(&reqBody); err != nil {
-			return c.HTML(http.StatusBadRequest, "<h1>Bad request</h1>")
+			response := map[string]any{
+				"URL":     URL,
+				"Code":    http.StatusBadRequest,
+				"Message": "Bad request",
+			}
+			return c.Render(http.StatusBadRequest, "error", response)
 		}
 		if reqBody.Nombre == "" {
-			return c.HTML(http.StatusBadRequest, "<h1>Ningun nombre dado</h1>")
+			response := map[string]any{
+				"URL":     URL,
+				"Code":    http.StatusBadRequest,
+				"Message": "Ningun nombre dado",
+			}
+			return c.Render(http.StatusBadRequest, "error", response)
 		}
 		_, err = dbConnection.Exec("INSERT INTO mascotas (nombre, edad, altura_cm, foto64, descripcion) VALUES (?, ?, ?, ?, ?)",
 			reqBody.Nombre, reqBody.Edad, reqBody.Altura_cm, reqBody.Foto64, reqBody.Descripcion)
 		if err != nil {
 			e.Logger.Error(err)
-			return c.HTML(http.StatusInternalServerError, "<h1>500: Internal server error</h1>")
+			response := map[string]any{
+				"URL":     URL,
+				"Code":    http.StatusInternalServerError,
+				"Message": "Internal server error",
+			}
+			return c.Render(http.StatusInternalServerError, "error", response)
 		}
 		e.Logger.Printf("inserted into db: %v", reqBody.Nombre)
 		response := map[string]any{
