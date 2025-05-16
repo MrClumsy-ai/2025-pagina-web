@@ -3,13 +3,10 @@
 <html lang="es">
   <head>
     <title>Contacto</title>
-    <link rel="icon" type="image/x-icon" href="/assets/img/favicon.ico">
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
-    {{ template "librerias" .}}
-    <link rel="stylesheet" href="/assets/contacto.css" />
+    {{ template "meta" . }}
+    {{ template "librerias" . }}
+    <link rel="stylesheet" href="{{ .URL }}/assets/contacto.css" />
   </head>
-
   <body>
   {{ template "navbar" . }}
     <main class="container-fluid" style="margin-top: 80px">
@@ -21,7 +18,6 @@
           Estamos felices de saber de ti. Escríbenos y te responderemos lo más
           pronto posible.
         </p>
-
         <div class="container mt-5">
           <div class="row">
             <!-- Formulario -->
@@ -39,7 +35,6 @@
                     required
                   />
                 </div>
-
                 <div class="mb-3">
                   <label for="correo" class="form-label text-light"
                     >Correo electrónico:</label
@@ -52,7 +47,6 @@
                     required
                   />
                 </div>
-
                 <div class="mb-3">
                   <label for="mensaje" class="form-label text-light"
                     >Mensaje:</label
@@ -65,13 +59,11 @@
                     required
                   ></textarea>
                 </div>
-
                 <button type="submit" class="rounded-pill p-4">
                   Enviar mensaje
                 </button>
               </form>
             </div>
-
             <!-- Redes sociales -->
             <div class="col-md-6 text-light">
               <h4 class="mb-3">Síguenos en nuestras redes 🐾</h4>

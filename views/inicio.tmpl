@@ -3,13 +3,11 @@
 <html lang="es">
   <head>
     <title>Adopta a un amigo</title>
-    <link rel="icon" type="image/x-icon" href="/assets/img/favicon.ico">
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
-    {{ template "librerias" .}}
-    <link rel="stylesheet" href="/assets/inicio.css" />
-    <link rel="stylesheet" href="/assets/mascotas.css" />
-    <script src="/assets/mascotas.js"></script>
+    {{ template "meta" . }}
+    {{ template "librerias" . }}
+    <link rel="stylesheet" href="{{ .URL }}/assets/inicio.css" />
+    <link rel="stylesheet" href="{{ .URL }}/assets/mascotas.css" />
+    <script src="{{ .URL }}/assets/mascotas.js"></script>
   </head>
   <body>
     {{ template "navbar" . }}
@@ -24,7 +22,7 @@
     <main class="container-fluid">
       <div class="container">
         <h2>Tu proximo amigo!</h2>
-        {{ template "mascota" .}}
+        {{ template "mascota" . }}
       </div>
       <div class="d-grid mx-auto">
         <a class="p-4 rounded-pill mx-auto" href="{{ .URL }}/mascotas"

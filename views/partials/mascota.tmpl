@@ -1,9 +1,10 @@
 {{ define "mascota" }}
-{{ range .Mascotas}}
+{{ range .Mascotas }}
 <div>
   <article class="container rounded-5 p-5">
     <img src="data:image/jpeg;base64,{{ .Foto64 }}" alt="Foto de la mascota" />
     <div>
+      <p>id: {{ .Id }}</p>
       <h3>{{ .Nombre }}</h3>
       <ul>
         <li>Edad: {{ .Edad }} anios</li>

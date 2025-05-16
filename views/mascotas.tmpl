@@ -1,17 +1,13 @@
 {{ define "mascotas" }}
 <!doctype html>
 <html lang="es">
-
 <head>
   <title>Mascotas</title>
-  <link rel="icon" type="image/x-icon" href="/assets/img/favicon.ico">
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-    {{ template "librerias" .}}
-  <link rel="stylesheet" href="assets/mascotas.css" />
-  <script src="/assets/mascotas.js"></script>
+  {{ template "meta" . }}
+  {{ template "librerias" . }}
+  <link rel="stylesheet" href="{{ .URL }}/assets/mascotas.css" />
+  <script src="{{ .URL }}/assets/mascotas.js"></script>
 </head>
-
 <body>
   {{ template "navbar" . }}
   <main class="container-fluid" style="margin-top: 80px">
@@ -20,8 +16,6 @@
       {{ template "mascota" . }}
     </div>
   </main>
-
 </body>
-
 </html>
 {{ end }}
