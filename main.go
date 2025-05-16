@@ -225,5 +225,14 @@ func main() {
 		return c.Render(http.StatusCreated, "registrado", response)
 	})
 
+	e.GET("/*", func(c echo.Context) error {
+		response := map[string]any{
+			"URL":     URL,
+			"Code":    http.StatusNotFound,
+			"Message": "Not found",
+		}
+		return c.Render(http.StatusNotFound, "error", response)
+	})
+
 	e.Logger.Fatal(e.Start(PORT))
 }

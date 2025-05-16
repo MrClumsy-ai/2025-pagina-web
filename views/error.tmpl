@@ -1,0 +1,19 @@
+{{ define "error" }}
+<!doctype html>
+<html lang="es">
+  <head>
+    <title>Error {{ .Code }}</title>
+    <link rel="icon" type="image/x-icon" href="/assets/img/favicon.ico">
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    {{ template "librerias" .}}
+  </head>
+  <body>
+    {{ template "navbar" . }}
+    <main class="container" style="margin-top: 80px">
+      <h1>{{ .Code }}: {{ .Message }}</h1>
+      <a href="{{ .URL }}/">Regresar al inicio</a>
+    </main>
+  </body>
+</html>
+{{ end }}
