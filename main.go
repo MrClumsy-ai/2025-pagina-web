@@ -205,8 +205,8 @@ func main() {
 		return c.Render(http.StatusOK, "registrar", response)
 	})
 
-	e.POST("/registrar", func(c echo.Context) error {
-		e.Logger.Print("POST /registrar")
+	e.POST("/mascotas", func(c echo.Context) error {
+		e.Logger.Print("POST /mascotas")
 		nombre := c.FormValue("nombre")
 		edad, err := strconv.Atoi(c.FormValue("edad"))
 		altura, err := strconv.Atoi(c.FormValue("altura"))
