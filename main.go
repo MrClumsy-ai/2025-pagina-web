@@ -218,26 +218,42 @@ func main() {
 		e.Logger.Print("POST /mascotas")
 		nombre := c.FormValue("nombre")
 		edad, err := strconv.Atoi(c.FormValue("edad"))
+		if err != nil {
+			response := map[string]any{
+				"URL":     URL,
+				"Code":    http.StatusUnprocessableEntity,
+				"Message": "Edad no es procesable",
+			}
+			return c.Render(http.StatusUnprocessableEntity, "error", response)
+		}
 		altura, err := strconv.Atoi(c.FormValue("altura"))
+		if err != nil {
+			response := map[string]any{
+				"URL":     URL,
+				"Code":    http.StatusUnprocessableEntity,
+				"Message": "Altura no es procesable",
+			}
+			return c.Render(http.StatusUnprocessableEntity, "error", response)
+		}
 		descripcion := c.FormValue("descripcion")
 		foto, err := c.FormFile("foto")
 		if err != nil {
 			response := map[string]any{
 				"URL":     URL,
-				"Code":    http.StatusBadRequest,
-				"Message": "Bad request",
+				"Code":    http.StatusUnprocessableEntity,
+				"Message": "Foto no es procesable",
 			}
-			return c.Render(http.StatusBadRequest, "error", response)
+			return c.Render(http.StatusUnprocessableEntity, "error", response)
 		}
 		src, err := foto.Open()
 		if err != nil {
 			e.Logger.Error(err)
 			response := map[string]any{
 				"URL":     URL,
-				"Code":    http.StatusInternalServerError,
-				"Message": "Internal server error",
+				"Code":    http.StatusUnprocessableEntity,
+				"Message": "Foto no pudo ser abierta",
 			}
-			return c.Render(http.StatusInternalServerError, "error", response)
+			return c.Render(http.StatusUnprocessableEntity, "error", response)
 		}
 		defer src.Close()
 		fotoBytes, err := io.ReadAll(src)
@@ -245,10 +261,10 @@ func main() {
 			e.Logger.Error(err)
 			response := map[string]any{
 				"URL":     URL,
-				"Code":    http.StatusInternalServerError,
-				"Message": "Internal server error",
+				"Code":    http.StatusUnprocessableEntity,
+				"Message": "Foto no pudo ser convertida a bytes",
 			}
-			return c.Render(http.StatusInternalServerError, "error", response)
+			return c.Render(http.StatusUnprocessableEntity, "error", response)
 		}
 		foto64 := base64.StdEncoding.EncodeToString(fotoBytes)
 		reqBody := Mascota{
@@ -323,13 +339,12 @@ func main() {
 
 	e.GET("/api/mascotas/:id", func(c echo.Context) error {
 		e.Logger.Print("GET /api/mascotas/id")
-		var mascota Mascota
 		pId, err := strconv.Atoi(c.Param("id"))
 		if err != nil {
 			e.Logger.Error(err)
 			return c.JSON(http.StatusInternalServerError, nil)
 		}
-		err = dbConnection.QueryRow("SELECT * FROM mascotas WHERE ID = ?", pId).Scan(&mascota.Id, &mascota.Nombre, &mascota.Edad, &mascota.Altura_cm, &mascota.Foto64, &mascota.Descripcion)
+		mascota, err := getMascotaById(pId)
 		if err != nil {
 			e.Logger.Error(err)
 			return c.JSON(http.StatusNotFound, "mascota not found")
