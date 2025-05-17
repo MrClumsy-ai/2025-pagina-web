@@ -22,7 +22,7 @@
           <div class="row">
             <!-- Formulario -->
             <div class="col-md-6 mb-4">
-              <form>
+              <form action="{{ .URL }}/contacto" method="post" enctype="multipart/form-data">
                 <div class="mb-3">
                   <label for="nombre" class="form-label text-light"
                     >Nombre:</label
@@ -30,8 +30,8 @@
                   <input
                     type="text"
                     class="form-control"
-                    id="nombre"
                     placeholder="Tu nombre"
+                    name="nombre"
                     required
                   />
                 </div>
@@ -42,8 +42,8 @@
                   <input
                     type="email"
                     class="form-control"
-                    id="correo"
                     placeholder="correo@ejemplo.com"
+                    name="email"
                     required
                   />
                 </div>
@@ -53,9 +53,9 @@
                   >
                   <textarea
                     class="form-control"
-                    id="mensaje"
                     rows="4"
                     placeholder="¿En qué podemos ayudarte?"
+                    name="mensaje"
                     required
                   ></textarea>
                 </div>

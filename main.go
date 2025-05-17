@@ -205,6 +205,19 @@ func main() {
 		return c.Render(http.StatusOK, "contacto", response)
 	})
 
+	e.POST("/contacto", func(c echo.Context) error {
+		e.Logger.Printf("POST /contacto")
+		nombre := c.FormValue("nombre")
+		email := c.FormValue("email")
+		mensaje := c.FormValue("mensaje")
+		e.Logger.Printf("%v (%v): %v", nombre, email, mensaje)
+		response := map[string]any{
+			"URL":          URL,
+			"CurrentRoute": "/contacto",
+		}
+		return c.Render(http.StatusOK, "contacto", response)
+	})
+
 	e.GET("/registrar", func(c echo.Context) error {
 		e.Logger.Print("GET /registrar")
 		response := map[string]any{
