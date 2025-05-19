@@ -410,6 +410,9 @@ func main() {
 		tipoDeVivienda := c.FormValue("tipo-de-vivienda")
 		esPropiedadViviendaRespuesta := c.FormValue("is-propiedad-propia")
 		tienePatioRespuesta := c.FormValue("tiene-patio")
+		// TODO query params para esto pls :ccc
+		nombre := c.QueryParam("nombre")
+		fmt.Printf("nombre: %v", nombre)
 		personasEnHogar, err := strconv.Atoi(c.FormValue("personas-en-hogar"))
 		if err != nil {
 			e.Logger.Error(err)
