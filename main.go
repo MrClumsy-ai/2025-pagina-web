@@ -429,6 +429,14 @@ func main() {
 			return c.JSON(http.StatusInternalServerError, nil)
 		}
 		mascota, err := getMascotaById(pId)
+		if err != nil {
+			response := map[string]any{
+				"URL":     URL,
+				"Code":    http.StatusNotFound,
+				"Message": "Mascota no encontrada",
+			}
+			return c.Render(http.StatusNotFound, "error", response)
+		}
 		response := map[string]any{
 			"URL":          URL,
 			"CurrentRoute": "/solicitud",
@@ -529,6 +537,8 @@ func main() {
 		}
 		return c.Render(http.StatusOK, "informacionHogar", response)
 	})
+
+	// TODO: POST para /solicitud/info-hogar/:id (desde informacionHogar.tmpl)
 
 	// JSON
 	e.GET("/json/mascotas", func(c echo.Context) error {
