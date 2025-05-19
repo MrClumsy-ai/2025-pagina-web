@@ -36,6 +36,14 @@ type Mensaje struct {
 	Mensaje string `form:"mensaje" json:"mensaje"`
 }
 
+type InformacionGeneral struct {
+	Nombre    string `form:"nombre" json:"nombre"`
+	Edad      int    `form:"edad" json:"edad"`
+	Email     string `form:"email" json:"email"`
+	Direccion string `form:"direccion" json:"direccion"`
+	Telefono  int    `form:"telefono" json:"telefono"`
+}
+
 type Mascotas []Mascota
 
 func (t *Templates) Render(w io.Writer, name string, data any, c echo.Context) error {
@@ -427,6 +435,99 @@ func main() {
 			"Mascota":      mascota,
 		}
 		return c.Render(http.StatusOK, "solicitudAdopcion", response)
+	})
+
+	e.POST("/solicitud/info-general/:id", func(c echo.Context) error {
+		pId, err := strconv.Atoi(c.Param("id"))
+		if err != nil {
+			e.Logger.Error(err)
+			response := map[string]any{
+				"URL":     URL,
+				"Code":    http.StatusInternalServerError,
+				"Message": "Param id unprocessable",
+			}
+			return c.Render(http.StatusInternalServerError, "error", response)
+		}
+		e.Logger.Printf("POST /solicitud/info-general/%v", pId)
+		nombre := c.FormValue("nombre")
+		if nombre == "" {
+			response := map[string]any{
+				"URL":     URL,
+				"Code":    http.StatusUnauthorized,
+				"Message": "nombre no solicitado",
+			}
+			return c.Render(http.StatusUnauthorized, "error", response)
+		}
+		edad, err := strconv.Atoi(c.FormValue("edad"))
+		if err != nil {
+			e.Logger.Error(err)
+			response := map[string]any{
+				"URL":     URL,
+				"Code":    http.StatusUnprocessableEntity,
+				"Message": "Edad no procesable",
+			}
+			return c.Render(http.StatusUnprocessableEntity, "error", response)
+		}
+		e.Logger.Printf("edad: %v", edad)
+		if edad < 18 || edad > 100 {
+			e.Logger.Error(err)
+			response := map[string]any{
+				"URL":     URL,
+				"Code":    http.StatusUnauthorized,
+				"Message": "Edad no es valida",
+			}
+			return c.Render(http.StatusUnauthorized, "error", response)
+		}
+		email := c.FormValue("email")
+		if email == "" {
+			response := map[string]any{
+				"URL":     URL,
+				"Code":    http.StatusUnauthorized,
+				"Message": "Email no solicitado",
+			}
+			return c.Render(http.StatusUnauthorized, "error", response)
+		}
+		direccion := c.FormValue("direccion")
+		if direccion == "" {
+			response := map[string]any{
+				"URL":     URL,
+				"Code":    http.StatusUnauthorized,
+				"Message": "Direccion no solicitada",
+			}
+			return c.Render(http.StatusUnauthorized, "error", response)
+		}
+		telefono, err := strconv.Atoi(c.FormValue("telefono"))
+		e.Logger.Printf("telefono: %v", telefono)
+		if telefono < 1_000_000_000 || telefono > 9_999_999_999 {
+			response := map[string]any{
+				"URL":     URL,
+				"Code":    http.StatusUnauthorized,
+				"Message": "Telefono debe tener 10 digitos",
+			}
+			return c.Render(http.StatusUnauthorized, "error", response)
+		}
+		informacionGeneral := InformacionGeneral{
+			Nombre:    nombre,
+			Edad:      edad,
+			Email:     email,
+			Direccion: direccion,
+			Telefono:  telefono,
+		}
+		_, err = getMascotaById(pId)
+		if err != nil {
+			response := map[string]any{
+				"URL":     URL,
+				"Code":    http.StatusNotFound,
+				"Message": "Mascota no encontrada",
+			}
+			return c.Render(http.StatusNotFound, "error", response)
+		}
+		response := map[string]any{
+			"URL":                URL,
+			"InformacionGeneral": informacionGeneral,
+			"MascotaId":          pId,
+		}
+		return c.Render(http.StatusOK, "informacionHogar", response)
 	})
 
 	// JSON
