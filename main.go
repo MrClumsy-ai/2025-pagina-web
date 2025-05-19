@@ -45,6 +45,14 @@ type InformacionGeneral struct {
 	Telefono  int    `form:"telefono" json:"telefono"`
 }
 
+// tipoDeVivienda, esPropiedadVivienda, tienePatio, personasEnHogar
+type InformacionHogar struct {
+	TipoDeVivienda      string `form:"tipo-de-vivienda" json:"tipo-de-vivienda"`
+	EsPropiedadVivienda bool   `form:"is-propiedad-vivienda" json:"is-propiedad-vivienda"`
+	TienePatio          bool   `form:"tiene-patio" json:"tiene-patio"`
+	PersonasEnHogar     int    `form:"personas-en-hogar" json:"personas-en-hogar"`
+}
+
 type Mascotas []Mascota
 
 func (t *Templates) Render(w io.Writer, name string, data any, c echo.Context) error {
@@ -352,7 +360,6 @@ func main() {
 			}
 			return c.Render(http.StatusUnprocessableEntity, "error", response)
 		}
-		e.Logger.Printf("telefono: %v", telefono)
 		if telefono < 1_000_000_000 || telefono > 9_999_999_999 {
 			e.Logger.Errorf("telefono: %v", telefono)
 			response := map[string]any{
@@ -389,7 +396,96 @@ func main() {
 
 	// TODO: POST para /adopcion/info-hogar/:id (desde informacionHogar.tmpl)
 	e.POST("/adopcion/info-hogar/:id", func(c echo.Context) error {
-		return c.JSON(http.StatusOK, "/adopcion/info-hogar/:id")
+		pId, err := strconv.Atoi(c.Param("id"))
+		if err != nil {
+			e.Logger.Error(err)
+			response := map[string]any{
+				"URL":     URL,
+				"Code":    http.StatusInternalServerError,
+				"Message": "Param id unprocessable",
+			}
+			return c.Render(http.StatusInternalServerError, "error", response)
+		}
+		fmt.Printf("POST /adopcion/info-hogar/%v\n", pId)
+		tipoDeVivienda := c.FormValue("tipo-de-vivienda")
+		esPropiedadViviendaRespuesta := c.FormValue("is-propiedad-propia")
+		tienePatioRespuesta := c.FormValue("tiene-patio")
+		personasEnHogar, err := strconv.Atoi(c.FormValue("personas-en-hogar"))
+		if err != nil {
+			e.Logger.Error(err)
+			response := map[string]any{
+				"URL":     URL,
+				"Code":    http.StatusUnprocessableEntity,
+				"Message": "Personas en hogar no procesable",
+			}
+			return c.Render(http.StatusUnprocessableEntity, "error", response)
+		}
+		// error handling
+		if tipoDeVivienda == "" {
+			e.Logger.Errorf("tipo de vivienda: %v", tipoDeVivienda)
+			response := map[string]any{
+				"URL":     URL,
+				"Code":    http.StatusUnprocessableEntity,
+				"Message": "Tipo de vivienda sin texto",
+			}
+			return c.Render(http.StatusUnprocessableEntity, "error", response)
+		}
+		var esPropiedadVivienda bool
+		switch esPropiedadViviendaRespuesta {
+		case "Si":
+			esPropiedadVivienda = true
+		case "No":
+			esPropiedadVivienda = false
+		default:
+			e.Logger.Errorf("es propiedad de vivienda: %v", esPropiedadViviendaRespuesta)
+			response := map[string]any{
+				"URL":     URL,
+				"Code":    http.StatusUnprocessableEntity,
+				"Message": "Es propiedad vivienda sin respuesta",
+			}
+			return c.Render(http.StatusUnprocessableEntity, "error", response)
+		}
+		var tienePatio bool
+		switch tienePatioRespuesta {
+		case "Si":
+			tienePatio = true
+		case "No":
+			tienePatio = false
+		default:
+			e.Logger.Errorf("tiene patio: ", tienePatioRespuesta)
+			response := map[string]any{
+				"URL":     URL,
+				"Code":    http.StatusUnprocessableEntity,
+				"Message": "Tiene patio respuesta no procesable",
+			}
+			return c.Render(http.StatusUnprocessableEntity, "error", response)
+		}
+		if personasEnHogar < 1 {
+			e.Logger.Errorf("personas en hogar: %v", personasEnHogar)
+			response := map[string]any{
+				"URL":     URL,
+				"Code":    http.StatusUnprocessableEntity,
+				"Message": "Personas en hogar no puede ser menor a 1",
+			}
+			return c.Render(http.StatusUnprocessableEntity, "error", response)
+		}
+		// tipoDeVivienda, esPropiedadVivienda, tienePatio, personasEnHogar
+		informacionHogar := InformacionHogar{
+			TipoDeVivienda:      tipoDeVivienda,
+			EsPropiedadVivienda: esPropiedadVivienda,
+			TienePatio:          tienePatio,
+			PersonasEnHogar:     personasEnHogar,
+		}
+		response := map[string]any{
+			"URL":              URL,
+			"MascotaId":        pId,
+			"InformacionHogar": informacionHogar,
+		}
+		return c.Render(http.StatusOK, "experienciaConMascotas", response)
+	})
+
+	e.POST("/adopcion/experiencia-mascotas/:id", func(c echo.Context) error {
+		return c.JSON(http.StatusOK, "/adopcion/experiencia-mascotas/:id")
 	})
 
 	e.POST("/contacto", func(c echo.Context) error {
