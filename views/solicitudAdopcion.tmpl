@@ -15,7 +15,7 @@
         <!-- {{ template "mascota" .Mascota }} -->
         <div class="container">
           <h2>Informacion general</h2>
-          <form method="post" action="{{ .URL }}/solicitud/info-general/{{ .Mascota.Id }}">
+          <form method="post" action="{{ .URL }}/adopcion/info-general/{{ .Mascota.Id }}">
             <label for="nombre">Nombre:</label>
             <input type="text" name="nombre" required/>
             <br />

@@ -3,6 +3,7 @@ package main
 import (
 	"database/sql"
 	"encoding/base64"
+	"fmt"
 	"net/http"
 	"strconv"
 
@@ -68,7 +69,7 @@ func main() {
 	if err != nil {
 		e.Logger.Fatal("Error connecting to %v: %v", dbLocation, err)
 	}
-	e.Logger.Printf("Database connection established: %v", dbLocation)
+	fmt.Printf("Database connection established: %v\n", dbLocation)
 	defer dbConnection.Close()
 	_, err = dbConnection.Exec(`CREATE TABLE IF NOT EXISTS mascotas (
 		id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -112,18 +113,27 @@ func main() {
 
 	getMascotaById := func(id int) (Mascota, error) {
 		var mascota Mascota
-		e.Logger.Printf("db: selecting id: %v", id)
 		err = dbConnection.QueryRow("SELECT * FROM mascotas WHERE ID = ?", id).Scan(&mascota.Id, &mascota.Nombre, &mascota.Edad, &mascota.Altura_cm, &mascota.Foto64, &mascota.Descripcion)
 		if err != nil {
+			e.Logger.Error(err)
 			return Mascota{}, err
 		}
-		e.Logger.Printf("mascota: %v", mascota)
 		return mascota, nil
+	}
+
+	getMensajeById := func(id int) (Mensaje, error) {
+		var mensaje Mensaje
+		err = dbConnection.QueryRow("SELECT * FROM mensajes WHERE ID = ?", id).Scan(&mensaje.Id, &mensaje.Nombre, &mensaje.Email, &mensaje.Mensaje)
+		if err != nil {
+			e.Logger.Error(err)
+			return Mensaje{}, err
+		}
+		return mensaje, nil
 	}
 
 	// routes
 	e.GET("/", func(c echo.Context) error {
-		e.Logger.Print("GET /")
+		fmt.Printf("GET /\n")
 		rows, err := dbConnection.Query("SELECT * FROM mascotas LIMIT 3")
 		if err != nil {
 			e.Logger.Error(err)
@@ -159,7 +169,7 @@ func main() {
 	})
 
 	e.GET("/adopcion", func(c echo.Context) error {
-		e.Logger.Print("GET /adopcion")
+		fmt.Printf("GET /adopcion\n")
 		response := map[string]any{
 			"URL":          URL,
 			"CurrentRoute": "/adopcion",
@@ -167,8 +177,144 @@ func main() {
 		return c.Render(http.StatusOK, "adopcion", response)
 	})
 
+	e.GET("/adopcion/:id", func(c echo.Context) error {
+		pId, err := strconv.Atoi(c.Param("id"))
+		if err != nil {
+			e.Logger.Error(err)
+			return c.JSON(http.StatusInternalServerError, nil)
+		}
+		fmt.Printf("GET /adopcion/%v\n", pId)
+		mascota, err := getMascotaById(pId)
+		if err != nil {
+			e.Logger.Error(err)
+			response := map[string]any{
+				"URL":     URL,
+				"Code":    http.StatusNotFound,
+				"Message": "Mascota no encontrada",
+			}
+			return c.Render(http.StatusNotFound, "error", response)
+		}
+		response := map[string]any{
+			"URL":          URL,
+			"CurrentRoute": "/adopcion",
+			"Mascota":      mascota,
+		}
+		return c.Render(http.StatusOK, "solicitudAdopcion", response)
+	})
+
+	e.POST("/adopcion/info-general/:id", func(c echo.Context) error {
+		pId, err := strconv.Atoi(c.Param("id"))
+		if err != nil {
+			e.Logger.Error(err)
+			response := map[string]any{
+				"URL":     URL,
+				"Code":    http.StatusInternalServerError,
+				"Message": "Param id unprocessable",
+			}
+			return c.Render(http.StatusInternalServerError, "error", response)
+		}
+		fmt.Printf("POST /adopcion/info-general/%v\n", pId)
+		nombre := c.FormValue("nombre")
+		if nombre == "" {
+			e.Logger.Errorf("nombre: %v", nombre)
+			response := map[string]any{
+				"URL":     URL,
+				"Code":    http.StatusUnauthorized,
+				"Message": "nombre no solicitado",
+			}
+			return c.Render(http.StatusUnauthorized, "error", response)
+		}
+		edad, err := strconv.Atoi(c.FormValue("edad"))
+		if err != nil {
+			e.Logger.Error(err)
+			response := map[string]any{
+				"URL":     URL,
+				"Code":    http.StatusUnprocessableEntity,
+				"Message": "Edad no procesable",
+			}
+			return c.Render(http.StatusUnprocessableEntity, "error", response)
+		}
+		if edad < 18 || edad > 100 {
+			e.Logger.Errorf("edad: %v", edad)
+			response := map[string]any{
+				"URL":     URL,
+				"Code":    http.StatusUnauthorized,
+				"Message": "Edad no es valida",
+			}
+			return c.Render(http.StatusUnauthorized, "error", response)
+		}
+		email := c.FormValue("email")
+		if email == "" {
+			e.Logger.Errorf("email: %v", email)
+			response := map[string]any{
+				"URL":     URL,
+				"Code":    http.StatusUnauthorized,
+				"Message": "Email no solicitado",
+			}
+			return c.Render(http.StatusUnauthorized, "error", response)
+		}
+		direccion := c.FormValue("direccion")
+		if direccion == "" {
+			e.Logger.Errorf("direccion: %v", direccion)
+			response := map[string]any{
+				"URL":     URL,
+				"Code":    http.StatusUnauthorized,
+				"Message": "Direccion no solicitada",
+			}
+			return c.Render(http.StatusUnauthorized, "error", response)
+		}
+		telefono, err := strconv.Atoi(c.FormValue("telefono"))
+		if err != nil {
+			e.Logger.Error(err)
+			response := map[string]any{
+				"URL":     URL,
+				"Code":    http.StatusUnprocessableEntity,
+				"Message": "telefono no procesable",
+			}
+			return c.Render(http.StatusUnprocessableEntity, "error", response)
+		}
+		e.Logger.Printf("telefono: %v", telefono)
+		if telefono < 1_000_000_000 || telefono > 9_999_999_999 {
+			e.Logger.Errorf("telefono: %v", telefono)
+			response := map[string]any{
+				"URL":     URL,
+				"Code":    http.StatusUnauthorized,
+				"Message": "Telefono debe tener 10 digitos",
+			}
+			return c.Render(http.StatusUnauthorized, "error", response)
+		}
+		informacionGeneral := InformacionGeneral{
+			Nombre:    nombre,
+			Edad:      edad,
+			Email:     email,
+			Direccion: direccion,
+			Telefono:  telefono,
+		}
+		_, err = getMascotaById(pId)
+		if err != nil {
+			e.Logger.Error(err)
+			response := map[string]any{
+				"URL":     URL,
+				"Code":    http.StatusNotFound,
+				"Message": "Mascota no encontrada",
+			}
+			return c.Render(http.StatusNotFound, "error", response)
+		}
+		response := map[string]any{
+			"URL":                URL,
+			"InformacionGeneral": informacionGeneral,
+			"MascotaId":          pId,
+		}
+		return c.Render(http.StatusOK, "informacionHogar", response)
+	})
+
+	// TODO: POST para /adopcion/info-hogar/:id (desde informacionHogar.tmpl)
+	e.POST("/adopcion/info-hogar/:id", func(c echo.Context) error {
+		return c.JSON(http.StatusOK, "/adopcion/info-hogar/:id")
+	})
+
 	e.GET("/mascotas", func(c echo.Context) error {
-		e.Logger.Print("GET /mascotas")
+		fmt.Printf("GET /mascotas\n")
 		mascotas, err := getAllMascotas()
 		if err != nil {
 			e.Logger.Error(err)
@@ -188,10 +334,11 @@ func main() {
 	})
 
 	e.POST("/mascotas", func(c echo.Context) error {
-		e.Logger.Print("POST /mascotas")
+		fmt.Printf("POST /mascotas\n")
 		nombre := c.FormValue("nombre")
 		edad, err := strconv.Atoi(c.FormValue("edad"))
 		if err != nil {
+			e.Logger.Error(err)
 			response := map[string]any{
 				"URL":     URL,
 				"Code":    http.StatusUnprocessableEntity,
@@ -201,6 +348,7 @@ func main() {
 		}
 		altura, err := strconv.Atoi(c.FormValue("altura"))
 		if err != nil {
+			e.Logger.Error(err)
 			response := map[string]any{
 				"URL":     URL,
 				"Code":    http.StatusUnprocessableEntity,
@@ -211,6 +359,7 @@ func main() {
 		descripcion := c.FormValue("descripcion")
 		foto, err := c.FormFile("foto")
 		if err != nil {
+			e.Logger.Error(err)
 			response := map[string]any{
 				"URL":     URL,
 				"Code":    http.StatusUnprocessableEntity,
@@ -248,6 +397,7 @@ func main() {
 			Foto64:      foto64,
 		}
 		if err := c.Bind(&reqBody); err != nil {
+			e.Logger.Error(err)
 			response := map[string]any{
 				"URL":     URL,
 				"Code":    http.StatusBadRequest,
@@ -256,6 +406,7 @@ func main() {
 			return c.Render(http.StatusBadRequest, "error", response)
 		}
 		if reqBody.Nombre == "" {
+			e.Logger.Errorf("reqBody.Nombre: %v", reqBody.Nombre)
 			response := map[string]any{
 				"URL":     URL,
 				"Code":    http.StatusBadRequest,
@@ -274,7 +425,7 @@ func main() {
 			}
 			return c.Render(http.StatusInternalServerError, "error", response)
 		}
-		e.Logger.Printf("inserted into db: %v", reqBody.Nombre)
+		fmt.Printf("inserted into db: %v\n", reqBody.Nombre)
 		row := dbConnection.QueryRow("SELECT * FROM mascotas ORDER BY ROWID DESC LIMIT 1")
 		var mascota Mascota
 		err = row.Scan(&mascota.Id, &mascota.Nombre, &mascota.Edad, &mascota.Altura_cm, &mascota.Foto64, &mascota.Descripcion)
@@ -287,7 +438,7 @@ func main() {
 			}
 			return c.Render(http.StatusInternalServerError, "error", response)
 		}
-		e.Logger.Printf("inserted id: %v", mascota.Id)
+		fmt.Printf("inserted id: %v\n", mascota.Id)
 		response := map[string]any{
 			"URL":          URL,
 			"CurrentRoute": "/registrar",
@@ -297,7 +448,6 @@ func main() {
 	})
 
 	e.GET("/mascotas/:id", func(c echo.Context) error {
-		e.Logger.Print("GET /mascotas/id")
 		pId, err := strconv.Atoi(c.Param("id"))
 		if err != nil {
 			e.Logger.Error(err)
@@ -308,6 +458,7 @@ func main() {
 			}
 			return c.Render(http.StatusInternalServerError, "error", response)
 		}
+		fmt.Printf("GET /mascotas/%v\n", pId)
 		mascota, err := getMascotaById(pId)
 		if err != nil {
 			e.Logger.Error(err)
@@ -324,12 +475,11 @@ func main() {
 			"CurrentRoute": "/mascotas",
 			"Mascotas":     mascotas,
 		}
-		e.Logger.Printf("mascotas: %v", mascotas)
 		return c.Render(http.StatusOK, "mascotas", response)
 	})
 
 	e.GET("/contacto", func(c echo.Context) error {
-		e.Logger.Print("GET /contacto")
+		fmt.Printf("GET /contacto\n")
 		response := map[string]any{
 			"URL":          URL,
 			"CurrentRoute": "/contacto",
@@ -338,7 +488,7 @@ func main() {
 	})
 
 	e.POST("/contacto", func(c echo.Context) error {
-		e.Logger.Printf("POST /contacto")
+		fmt.Printf("POST /contacto\n")
 		nombre := c.FormValue("nombre")
 		email := c.FormValue("email")
 		mensaje := c.FormValue("mensaje")
@@ -347,8 +497,8 @@ func main() {
 			Email:   email,
 			Mensaje: mensaje,
 		}
-		e.Logger.Printf("%v (%v): %v", reqBody.Nombre, reqBody.Email, reqBody.Mensaje)
 		if err := c.Bind(&reqBody); err != nil {
+			e.Logger.Error(err)
 			response := map[string]any{
 				"URL":     URL,
 				"Code":    http.StatusBadRequest,
@@ -357,6 +507,7 @@ func main() {
 			return c.Render(http.StatusBadRequest, "error", response)
 		}
 		if reqBody.Nombre == "" {
+			e.Logger.Errorf("reqBody.Nombre: %v", reqBody.Nombre)
 			response := map[string]any{
 				"URL":     URL,
 				"Code":    http.StatusBadRequest,
@@ -365,6 +516,7 @@ func main() {
 			return c.Render(http.StatusBadRequest, "error", response)
 		}
 		if reqBody.Email == "" {
+			e.Logger.Errorf("reqBody.Email: %v", reqBody.Email)
 			response := map[string]any{
 				"URL":     URL,
 				"Code":    http.StatusBadRequest,
@@ -373,6 +525,7 @@ func main() {
 			return c.Render(http.StatusBadRequest, "error", response)
 		}
 		if reqBody.Mensaje == "" {
+			e.Logger.Errorf("reqBody.Mensaje: %v", reqBody.Mensaje)
 			response := map[string]any{
 				"URL":     URL,
 				"Code":    http.StatusBadRequest,
@@ -391,7 +544,6 @@ func main() {
 			}
 			return c.Render(http.StatusInternalServerError, "error", response)
 		}
-		e.Logger.Printf("inserted into db: %v", reqBody.Nombre)
 		row := dbConnection.QueryRow("SELECT * FROM mensajes ORDER BY ROWID DESC LIMIT 1")
 		var g_mensaje Mensaje
 		err = row.Scan(&g_mensaje.Id, &g_mensaje.Nombre, &g_mensaje.Email, &g_mensaje.Mensaje)
@@ -404,7 +556,7 @@ func main() {
 			}
 			return c.Render(http.StatusInternalServerError, "error", response)
 		}
-		e.Logger.Printf("inserted id: %v", g_mensaje.Id)
+		fmt.Printf("inserted (%v): %v (%v): %v\n", g_mensaje.Id, g_mensaje.Nombre, g_mensaje.Email, g_mensaje.Mensaje)
 		response := map[string]any{
 			"URL":          URL,
 			"CurrentRoute": "/registrar",
@@ -414,7 +566,7 @@ func main() {
 	})
 
 	e.GET("/registrar", func(c echo.Context) error {
-		e.Logger.Print("GET /registrar")
+		fmt.Printf("GET /registrar\n")
 		response := map[string]any{
 			"URL":          URL,
 			"CurrentRoute": "/registrar",
@@ -422,145 +574,28 @@ func main() {
 		return c.Render(http.StatusOK, "registrar", response)
 	})
 
-	e.GET("/solicitud/:id", func(c echo.Context) error {
-		pId, err := strconv.Atoi(c.Param("id"))
-		if err != nil {
-			e.Logger.Error(err)
-			return c.JSON(http.StatusInternalServerError, nil)
-		}
-		mascota, err := getMascotaById(pId)
-		if err != nil {
-			response := map[string]any{
-				"URL":     URL,
-				"Code":    http.StatusNotFound,
-				"Message": "Mascota no encontrada",
-			}
-			return c.Render(http.StatusNotFound, "error", response)
-		}
-		response := map[string]any{
-			"URL":          URL,
-			"CurrentRoute": "/solicitud",
-			"Mascota":      mascota,
-		}
-		return c.Render(http.StatusOK, "solicitudAdopcion", response)
-	})
-
-	e.POST("/solicitud/info-general/:id", func(c echo.Context) error {
-		pId, err := strconv.Atoi(c.Param("id"))
-		if err != nil {
-			e.Logger.Error(err)
-			response := map[string]any{
-				"URL":     URL,
-				"Code":    http.StatusInternalServerError,
-				"Message": "Param id unprocessable",
-			}
-			return c.Render(http.StatusInternalServerError, "error", response)
-		}
-		e.Logger.Printf("POST /solicitud/info-general/%v", pId)
-		nombre := c.FormValue("nombre")
-		if nombre == "" {
-			response := map[string]any{
-				"URL":     URL,
-				"Code":    http.StatusUnauthorized,
-				"Message": "nombre no solicitado",
-			}
-			return c.Render(http.StatusUnauthorized, "error", response)
-		}
-		edad, err := strconv.Atoi(c.FormValue("edad"))
-		if err != nil {
-			e.Logger.Error(err)
-			response := map[string]any{
-				"URL":     URL,
-				"Code":    http.StatusUnprocessableEntity,
-				"Message": "Edad no procesable",
-			}
-			return c.Render(http.StatusUnprocessableEntity, "error", response)
-		}
-		e.Logger.Printf("edad: %v", edad)
-		if edad < 18 || edad > 100 {
-			e.Logger.Error(err)
-			response := map[string]any{
-				"URL":     URL,
-				"Code":    http.StatusUnauthorized,
-				"Message": "Edad no es valida",
-			}
-			return c.Render(http.StatusUnauthorized, "error", response)
-		}
-		email := c.FormValue("email")
-		if email == "" {
-			response := map[string]any{
-				"URL":     URL,
-				"Code":    http.StatusUnauthorized,
-				"Message": "Email no solicitado",
-			}
-			return c.Render(http.StatusUnauthorized, "error", response)
-		}
-		direccion := c.FormValue("direccion")
-		if direccion == "" {
-			response := map[string]any{
-				"URL":     URL,
-				"Code":    http.StatusUnauthorized,
-				"Message": "Direccion no solicitada",
-			}
-			return c.Render(http.StatusUnauthorized, "error", response)
-		}
-		telefono, err := strconv.Atoi(c.FormValue("telefono"))
-		e.Logger.Printf("telefono: %v", telefono)
-		if telefono < 1_000_000_000 || telefono > 9_999_999_999 {
-			response := map[string]any{
-				"URL":     URL,
-				"Code":    http.StatusUnauthorized,
-				"Message": "Telefono debe tener 10 digitos",
-			}
-			return c.Render(http.StatusUnauthorized, "error", response)
-		}
-		informacionGeneral := InformacionGeneral{
-			Nombre:    nombre,
-			Edad:      edad,
-			Email:     email,
-			Direccion: direccion,
-			Telefono:  telefono,
-		}
-		_, err = getMascotaById(pId)
-		if err != nil {
-			response := map[string]any{
-				"URL":     URL,
-				"Code":    http.StatusNotFound,
-				"Message": "Mascota no encontrada",
-			}
-			return c.Render(http.StatusNotFound, "error", response)
-		}
-		response := map[string]any{
-			"URL":                URL,
-			"InformacionGeneral": informacionGeneral,
-			"MascotaId":          pId,
-		}
-		return c.Render(http.StatusOK, "informacionHogar", response)
-	})
-
-	// TODO: POST para /solicitud/info-hogar/:id (desde informacionHogar.tmpl)
-
 	// JSON
 	e.GET("/json/mascotas", func(c echo.Context) error {
-		e.Logger.Print("GET /json/mascotas")
+		fmt.Printf("GET /json/mascotas\n")
 		mascotas, err := getAllMascotas()
 		if err != nil {
-			e.Logger.Fatal(err)
+			e.Logger.Error(err)
 			return c.JSON(http.StatusInternalServerError, nil)
 		}
 		if len(mascotas) == 0 {
+			e.Logger.Errorf("len(mascotas): %v", len(mascotas))
 			return c.JSON(http.StatusNotFound, nil)
 		}
 		return c.JSON(http.StatusFound, mascotas)
 	})
 
 	e.GET("/json/mascotas/:id", func(c echo.Context) error {
-		e.Logger.Print("GET /json/mascotas/id")
 		pId, err := strconv.Atoi(c.Param("id"))
 		if err != nil {
 			e.Logger.Error(err)
 			return c.JSON(http.StatusInternalServerError, nil)
 		}
+		e.Logger.Printf("GET /json/mascotas/%v", pId)
 		mascota, err := getMascotaById(pId)
 		if err != nil {
 			e.Logger.Error(err)
@@ -570,9 +605,10 @@ func main() {
 	})
 
 	e.GET("/json/contacto", func(c echo.Context) error {
-		e.Logger.Print("GET /json/contacto")
+		fmt.Printf("GET /json/contacto\n")
 		rows, err := dbConnection.Query("SELECT * FROM mensajes")
 		if err != nil {
+			e.Logger.Error(err)
 			response := map[string]any{
 				"URL":     URL,
 				"Code":    http.StatusInternalServerError,
@@ -586,6 +622,7 @@ func main() {
 			var mensaje Mensaje
 			err := rows.Scan(&mensaje.Id, &mensaje.Nombre, &mensaje.Email, &mensaje.Mensaje)
 			if err != nil {
+				e.Logger.Error(err)
 				response := map[string]any{
 					"URL":     URL,
 					"Code":    http.StatusInternalServerError,
@@ -596,6 +633,7 @@ func main() {
 			mensajes = append(mensajes, mensaje)
 		}
 		if len(mensajes) == 0 {
+			e.Logger.Errorf("len(mensajes): %v", len(mensajes))
 			response := map[string]any{
 				"URL":     URL,
 				"Code":    http.StatusNotFound,
@@ -606,8 +644,49 @@ func main() {
 		return c.JSON(http.StatusFound, mensajes)
 	})
 
+	e.DELETE("/json/contacto/:id", func(c echo.Context) error {
+		pId, err := strconv.Atoi(c.Param("id"))
+		if err != nil {
+			e.Logger.Error(err)
+			return c.JSON(http.StatusUnprocessableEntity, "param id no procesable")
+		}
+		fmt.Printf("DELETE /json/contacto/%v\n", pId)
+		mensaje, err := getMensajeById(pId)
+		if err != nil {
+			e.Logger.Error(err)
+			return c.JSON(http.StatusNotFound, "mensaje not found")
+		}
+		_, err = dbConnection.Exec("DELETE FROM mensajes WHERE id = ?", mensaje.Id)
+		if err != nil {
+			e.Logger.Error(err)
+			return c.JSON(http.StatusInternalServerError, "mensaje no se pudo borrar")
+		}
+		return c.JSON(http.StatusOK, mensaje)
+	})
+
+	e.DELETE("/json/mascotas/:id", func(c echo.Context) error {
+		pId, err := strconv.Atoi(c.Param("id"))
+		if err != nil {
+			e.Logger.Error(err)
+			return c.JSON(http.StatusUnprocessableEntity, "param id no procesable")
+		}
+		fmt.Printf("DELETE /json/mascotas/%v\n", pId)
+		mascota, err := getMascotaById(pId)
+		if err != nil {
+			e.Logger.Error(err)
+			return c.JSON(http.StatusNotFound, "mascota no encontrada")
+		}
+		_, err = dbConnection.Exec("DELETE FROM mascotas WHERE id = ?", mascota.Id)
+		if err != nil {
+			e.Logger.Error(err)
+			return c.JSON(http.StatusInternalServerError, "mascota no se pudo borrar")
+		}
+		return c.JSON(http.StatusOK, mascota)
+	})
+
 	// catch all route
 	e.GET("/*", func(c echo.Context) error {
+		fmt.Printf("GET catchall\n")
 		response := map[string]any{
 			"URL":     URL,
 			"Code":    http.StatusNotFound,
