@@ -14,7 +14,28 @@
     <main class="container-fluid" style="margin-top: 80px">
       <div class="container">
         <h1>Formulario de adopcion</h1>
-        {{ template "mascota" .Mascota }}
+        <p>Completa la siguiente informacion para comenzar el proceso de adopcion</p>
+        <!-- {{ template "mascota" .Mascota }} -->
+        <div class="container">
+          <h2>Informacion general</h2>
+          <form>
+            <label for="nombre">Nombre:</label>
+            <input type="text" name="nombre" />
+            <br />
+            <label for="edad">Edad:</label>
+            <input type="number" name="edad" />
+            <label for="direccion">Direccion:</label>
+            <input type="text" name="direccion" />
+            <br />
+            <label for="email">Email:</label>
+            <input type="email" name="email" />
+            <br />
+            <label for="telefono">Numero telefonico:</label>
+            <input type="number" name="telefono" />
+            <br />
+            <button class="button p-4 rounded-pill" type="submit">Siguiente</button>
+          </form>
+        </div>
       </div>
     </main>
   </body>
