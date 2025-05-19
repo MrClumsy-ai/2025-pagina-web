@@ -13,7 +13,9 @@
   <main class="container-fluid" style="margin-top: 80px">
     <div class="container">
       <h2>Tu proximo amigo!</h2>
-      {{ template "mascota" . }}
+      {{ range .Mascotas }}
+        {{ template "mascota" . }}
+      {{ end }}
     </div>
   </main>
 </body>

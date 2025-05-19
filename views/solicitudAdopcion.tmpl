@@ -1,0 +1,22 @@
+{{ define "solicitudAdopcion" }}
+<!doctype html>
+<html lang="es">
+  <head>
+    <title>Solicitud para {{ .Mascota.Nombre }}</title>
+    {{ template "meta" . }}
+    {{ template "librerias" . }}
+    <link rel="stylesheet" href="{{ .URL }}/assets/inicio.css" />
+    <link rel="stylesheet" href="{{ .URL }}/assets/mascotas.css" />
+    <script src="{{ .URL }}/assets/mascotas.js"></script>
+  </head>
+  <body>
+    {{ template "navbar" . }}
+    <main class="container-fluid" style="margin-top: 80px">
+      <div class="container">
+        <h1>Formulario de adopcion</h1>
+        {{ template "mascota" .Mascota }}
+      </div>
+    </main>
+  </body>
+</html>
+{{ end }}

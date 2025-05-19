@@ -179,6 +179,115 @@ func main() {
 		return c.Render(http.StatusOK, "mascotas", response)
 	})
 
+	e.POST("/mascotas", func(c echo.Context) error {
+		e.Logger.Print("POST /mascotas")
+		nombre := c.FormValue("nombre")
+		edad, err := strconv.Atoi(c.FormValue("edad"))
+		if err != nil {
+			response := map[string]any{
+				"URL":     URL,
+				"Code":    http.StatusUnprocessableEntity,
+				"Message": "Edad no es procesable",
+			}
+			return c.Render(http.StatusUnprocessableEntity, "error", response)
+		}
+		altura, err := strconv.Atoi(c.FormValue("altura"))
+		if err != nil {
+			response := map[string]any{
+				"URL":     URL,
+				"Code":    http.StatusUnprocessableEntity,
+				"Message": "Altura no es procesable",
+			}
+			return c.Render(http.StatusUnprocessableEntity, "error", response)
+		}
+		descripcion := c.FormValue("descripcion")
+		foto, err := c.FormFile("foto")
+		if err != nil {
+			response := map[string]any{
+				"URL":     URL,
+				"Code":    http.StatusUnprocessableEntity,
+				"Message": "Foto no es procesable",
+			}
+			return c.Render(http.StatusUnprocessableEntity, "error", response)
+		}
+		src, err := foto.Open()
+		if err != nil {
+			e.Logger.Error(err)
+			response := map[string]any{
+				"URL":     URL,
+				"Code":    http.StatusUnprocessableEntity,
+				"Message": "Foto no pudo ser abierta",
+			}
+			return c.Render(http.StatusUnprocessableEntity, "error", response)
+		}
+		defer src.Close()
+		fotoBytes, err := io.ReadAll(src)
+		if err != nil {
+			e.Logger.Error(err)
+			response := map[string]any{
+				"URL":     URL,
+				"Code":    http.StatusUnprocessableEntity,
+				"Message": "Foto no pudo ser convertida a bytes",
+			}
+			return c.Render(http.StatusUnprocessableEntity, "error", response)
+		}
+		foto64 := base64.StdEncoding.EncodeToString(fotoBytes)
+		reqBody := Mascota{
+			Nombre:      nombre,
+			Edad:        edad,
+			Altura_cm:   altura,
+			Descripcion: descripcion,
+			Foto64:      foto64,
+		}
+		if err := c.Bind(&reqBody); err != nil {
+			response := map[string]any{
+				"URL":     URL,
+				"Code":    http.StatusBadRequest,
+				"Message": "Bad request",
+			}
+			return c.Render(http.StatusBadRequest, "error", response)
+		}
+		if reqBody.Nombre == "" {
+			response := map[string]any{
+				"URL":     URL,
+				"Code":    http.StatusBadRequest,
+				"Message": "Ningun nombre dado",
+			}
+			return c.Render(http.StatusBadRequest, "error", response)
+		}
+		_, err = dbConnection.Exec("INSERT INTO mascotas (nombre, edad, altura_cm, foto64, descripcion) VALUES (?, ?, ?, ?, ?)",
+			reqBody.Nombre, reqBody.Edad, reqBody.Altura_cm, reqBody.Foto64, reqBody.Descripcion)
+		if err != nil {
+			e.Logger.Error(err)
+			response := map[string]any{
+				"URL":     URL,
+				"Code":    http.StatusInternalServerError,
+				"Message": "Error inserting into DB",
+			}
+			return c.Render(http.StatusInternalServerError, "error", response)
+		}
+		e.Logger.Printf("inserted into db: %v", reqBody.Nombre)
+		row := dbConnection.QueryRow("SELECT * FROM mascotas ORDER BY ROWID DESC LIMIT 1")
+		var mascota Mascota
+		err = row.Scan(&mascota.Id, &mascota.Nombre, &mascota.Edad, &mascota.Altura_cm, &mascota.Foto64, &mascota.Descripcion)
+		if err != nil {
+			e.Logger.Error(err)
+			response := map[string]any{
+				"URL":     URL,
+				"Code":    http.StatusInternalServerError,
+				"Message": "Error retrieving row",
+			}
+			return c.Render(http.StatusInternalServerError, "error", response)
+		}
+		e.Logger.Printf("inserted id: %v", mascota.Id)
+		response := map[string]any{
+			"URL":          URL,
+			"CurrentRoute": "/registrar",
+			"Mascota":      mascota,
+		}
+		return c.Render(http.StatusCreated, "registrado", response)
+	})
+
 	e.GET("/mascotas/:id", func(c echo.Context) error {
 		e.Logger.Print("GET /mascotas/id")
 		pId, err := strconv.Atoi(c.Param("id"))
@@ -305,113 +414,19 @@ func main() {
 		return c.Render(http.StatusOK, "registrar", response)
 	})
 
-	e.POST("/mascotas", func(c echo.Context) error {
-		e.Logger.Print("POST /mascotas")
-		nombre := c.FormValue("nombre")
-		edad, err := strconv.Atoi(c.FormValue("edad"))
-		if err != nil {
-			response := map[string]any{
-				"URL":     URL,
-				"Code":    http.StatusUnprocessableEntity,
-				"Message": "Edad no es procesable",
-			}
-			return c.Render(http.StatusUnprocessableEntity, "error", response)
-		}
-		altura, err := strconv.Atoi(c.FormValue("altura"))
-		if err != nil {
-			response := map[string]any{
-				"URL":     URL,
-				"Code":    http.StatusUnprocessableEntity,
-				"Message": "Altura no es procesable",
-			}
-			return c.Render(http.StatusUnprocessableEntity, "error", response)
-		}
-		descripcion := c.FormValue("descripcion")
-		foto, err := c.FormFile("foto")
-		if err != nil {
-			response := map[string]any{
-				"URL":     URL,
-				"Code":    http.StatusUnprocessableEntity,
-				"Message": "Foto no es procesable",
-			}
-			return c.Render(http.StatusUnprocessableEntity, "error", response)
-		}
-		src, err := foto.Open()
+	e.GET("/solicitud/:id", func(c echo.Context) error {
+		pId, err := strconv.Atoi(c.Param("id"))
 		if err != nil {
 			e.Logger.Error(err)
-			response := map[string]any{
-				"URL":     URL,
-				"Code":    http.StatusUnprocessableEntity,
-				"Message": "Foto no pudo ser abierta",
-			}
-			return c.Render(http.StatusUnprocessableEntity, "error", response)
+			return c.JSON(http.StatusInternalServerError, nil)
 		}
-		defer src.Close()
-		fotoBytes, err := io.ReadAll(src)
-		if err != nil {
-			e.Logger.Error(err)
-			response := map[string]any{
-				"URL":     URL,
-				"Code":    http.StatusUnprocessableEntity,
-				"Message": "Foto no pudo ser convertida a bytes",
-			}
-			return c.Render(http.StatusUnprocessableEntity, "error", response)
-		}
-		foto64 := base64.StdEncoding.EncodeToString(fotoBytes)
-		reqBody := Mascota{
-			Nombre:      nombre,
-			Edad:        edad,
-			Altura_cm:   altura,
-			Descripcion: descripcion,
-			Foto64:      foto64,
-		}
-		if err := c.Bind(&reqBody); err != nil {
-			response := map[string]any{
-				"URL":     URL,
-				"Code":    http.StatusBadRequest,
-				"Message": "Bad request",
-			}
-			return c.Render(http.StatusBadRequest, "error", response)
-		}
-		if reqBody.Nombre == "" {
-			response := map[string]any{
-				"URL":     URL,
-				"Code":    http.StatusBadRequest,
-				"Message": "Ningun nombre dado",
-			}
-			return c.Render(http.StatusBadRequest, "error", response)
-		}
-		_, err = dbConnection.Exec("INSERT INTO mascotas (nombre, edad, altura_cm, foto64, descripcion) VALUES (?, ?, ?, ?, ?)",
-			reqBody.Nombre, reqBody.Edad, reqBody.Altura_cm, reqBody.Foto64, reqBody.Descripcion)
-		if err != nil {
-			e.Logger.Error(err)
-			response := map[string]any{
-				"URL":     URL,
-				"Code":    http.StatusInternalServerError,
-				"Message": "Error inserting into DB",
-			}
-			return c.Render(http.StatusInternalServerError, "error", response)
-		}
-		e.Logger.Printf("inserted into db: %v", reqBody.Nombre)
-		row := dbConnection.QueryRow("SELECT * FROM mascotas ORDER BY ROWID DESC LIMIT 1")
-		var mascota Mascota
-		err = row.Scan(&mascota.Id, &mascota.Nombre, &mascota.Edad, &mascota.Altura_cm, &mascota.Foto64, &mascota.Descripcion)
-		if err != nil {
-			e.Logger.Error(err)
-			response := map[string]any{
-				"URL":     URL,
-				"Code":    http.StatusInternalServerError,
-				"Message": "Error retrieving row",
-			}
-			return c.Render(http.StatusInternalServerError, "error", response)
-		}
-		e.Logger.Printf("inserted id: %v", mascota.Id)
+		mascota, err := getMascotaById(pId)
 		response := map[string]any{
 			"URL":          URL,
-			"CurrentRoute": "/registrar",
+			"CurrentRoute": "/solicitud",
 			"Mascota":      mascota,
 		}
-		return c.Render(http.StatusCreated, "registrado", response)
+		return c.Render(http.StatusOK, "solicitudAdopcion", response)
 	})
 
 	// JSON
@@ -480,6 +495,7 @@ func main() {
 		return c.JSON(http.StatusFound, mensajes)
 	})
 
+	// catch all route
 	e.GET("/*", func(c echo.Context) error {
 		response := map[string]any{
 			"URL":     URL,

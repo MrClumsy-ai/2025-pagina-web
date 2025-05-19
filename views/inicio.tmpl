@@ -22,7 +22,9 @@
     <main class="container-fluid">
       <div class="container">
         <h2>Tu proximo amigo!</h2>
-        {{ template "mascota" . }}
+        {{ range .Mascotas }}
+          {{ template "mascota" . }}
+        {{ end }}
       </div>
       <div class="d-grid mx-auto">
         <a class="p-4 rounded-pill mx-auto" href="{{ .URL }}/mascotas"
