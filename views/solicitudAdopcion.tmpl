@@ -5,9 +5,6 @@
     <title>Solicitud para {{ .Mascota.Nombre }}</title>
     {{ template "meta" . }}
     {{ template "librerias" . }}
-    <link rel="stylesheet" href="{{ .URL }}/assets/inicio.css" />
-    <link rel="stylesheet" href="{{ .URL }}/assets/mascotas.css" />
-    <script src="{{ .URL }}/assets/mascotas.js"></script>
   </head>
   <body>
     {{ template "navbar" . }}
@@ -20,18 +17,18 @@
           <h2>Informacion general</h2>
           <form method="post" action="{{ .URL }}/solicitud/info-general/{{ .Mascota.Id }}">
             <label for="nombre">Nombre:</label>
-            <input type="text" name="nombre" />
+            <input type="text" name="nombre" required/>
             <br />
             <label for="edad">Edad:</label>
-            <input type="number" name="edad" />
+            <input type="number" name="edad" required/>
             <label for="direccion">Direccion:</label>
-            <input type="text" name="direccion" />
+            <input type="text" name="direccion" required/>
             <br />
             <label for="email">Email:</label>
-            <input type="email" name="email" />
+            <input type="email" name="email" required/>
             <br />
             <label for="telefono">Numero telefonico:</label>
-            <input type="number" name="telefono" />
+            <input type="number" name="telefono" required/>
             <br />
             <button class="button p-4 rounded-pill" type="submit">Siguiente</button>
           </form>
