@@ -585,35 +585,7 @@ func main() {
 	})
 
 	// ######################### JSON #########################
-	e.GET("/json/mascotas", func(c echo.Context) error {
-		fmt.Printf("GET /json/mascotas\n")
-		mascotas, err := getAllMascotas()
-		if err != nil {
-			e.Logger.Error(err)
-			return c.JSON(http.StatusInternalServerError, nil)
-		}
-		if len(mascotas) == 0 {
-			e.Logger.Errorf("len(mascotas): %v", len(mascotas))
-			return c.JSON(http.StatusNotFound, nil)
-		}
-		return c.JSON(http.StatusFound, mascotas)
-	})
-
-	e.GET("/json/mascotas/:id", func(c echo.Context) error {
-		pId, err := strconv.Atoi(c.Param("id"))
-		if err != nil {
-			e.Logger.Error(err)
-			return c.JSON(http.StatusInternalServerError, nil)
-		}
-		e.Logger.Printf("GET /json/mascotas/%v", pId)
-		mascota, err := getMascotaById(pId)
-		if err != nil {
-			e.Logger.Error(err)
-			return c.JSON(http.StatusNotFound, "mascota not found")
-		}
-		return c.JSON(http.StatusFound, mascota)
-	})
-
+	// ------------------------- GET -------------------------
 	e.GET("/json/contacto", func(c echo.Context) error {
 		fmt.Printf("GET /json/contacto\n")
 		rows, err := dbConnection.Query("SELECT * FROM mensajes")
@@ -654,6 +626,36 @@ func main() {
 		return c.JSON(http.StatusFound, mensajes)
 	})
 
+	e.GET("/json/mascotas", func(c echo.Context) error {
+		fmt.Printf("GET /json/mascotas\n")
+		mascotas, err := getAllMascotas()
+		if err != nil {
+			e.Logger.Error(err)
+			return c.JSON(http.StatusInternalServerError, nil)
+		}
+		if len(mascotas) == 0 {
+			e.Logger.Errorf("len(mascotas): %v", len(mascotas))
+			return c.JSON(http.StatusNotFound, nil)
+		}
+		return c.JSON(http.StatusFound, mascotas)
+	})
+
+	e.GET("/json/mascotas/:id", func(c echo.Context) error {
+		pId, err := strconv.Atoi(c.Param("id"))
+		if err != nil {
+			e.Logger.Error(err)
+			return c.JSON(http.StatusInternalServerError, nil)
+		}
+		e.Logger.Printf("GET /json/mascotas/%v", pId)
+		mascota, err := getMascotaById(pId)
+		if err != nil {
+			e.Logger.Error(err)
+			return c.JSON(http.StatusNotFound, "mascota not found")
+		}
+		return c.JSON(http.StatusFound, mascota)
+	})
+
+	// ------------------------- DELETE -------------------------
 	e.DELETE("/json/contacto/:id", func(c echo.Context) error {
 		pId, err := strconv.Atoi(c.Param("id"))
 		if err != nil {
