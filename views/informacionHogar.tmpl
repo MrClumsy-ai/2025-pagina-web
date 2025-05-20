@@ -14,7 +14,7 @@
         <div class="container">
           <h2>Informacion del hogar</h2>
           <form method="post" 
-            action="{{ .URL }}/adopcion/info-hogar/{{ .MascotaId }}?nombre={{ .InformacionGeneral.Nombre }}">
+            action="{{ .URL }}/adopcion/info-hogar/{{ .MascotaId }}?nombre={{ .InformacionGeneral.Nombre }}?edad={{ .InformacionGeneral.Edad }}?email={{ .InformacionGeneral.Email }}?direccion={{ .InformacionGeneral.Direccion }}?telefono={{ .InformacionGeneral.Telefono }}">
             <label for="tipo-de-vivienda">Tipo de vivienda</label>
             <input type="text" name="tipo-de-vivienda" />
             <br />
