@@ -1,7 +1,5 @@
 document.addEventListener("DOMContentLoaded", () => {
-  const verDetalles = document.querySelectorAll(".ver-detalles");
-  const ocultarDetalles = document.querySelectorAll(".close-btn");
-  verDetalles.forEach((button) => {
+  document.querySelectorAll(".ver-detalles").forEach((button) => {
     button.addEventListener("click", () => {
       const targetDiv = button.closest("article").nextElementSibling;
       if (targetDiv.classList.contains("hidden")) {
@@ -9,7 +7,7 @@ document.addEventListener("DOMContentLoaded", () => {
       }
     });
   });
-  ocultarDetalles.forEach((button) => {
+  document.querySelectorAll(".close-btn").forEach((button) => {
     button.addEventListener("click", () => {
       button.closest(".modal-mascota").classList.replace("flex", "hidden");
     });
