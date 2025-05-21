@@ -200,7 +200,18 @@ func postInfoHogar(c echo.Context) error {
 	direccion := c.QueryParam("direccion")
 	telefono := c.QueryParam("telefono")
 	infoGeneral, err := database.ValidarInfoGeneral(nombre, edad, email, direccion, telefono)
+	if err != nil {
+		e.Logger.Error(err)
+		response := map[string]any{
+			"URL":     _URL,
+			"Code":    http.StatusBadRequest,
+			"Message": err,
+		}
+		return c.Render(http.StatusBadRequest, "error", response)
+	}
 	infoHogar, err := database.ValidarInfoHogar(tipoDeVivienda, esPropiedadVivienda, tienePatio, personasEnHogar)
+	fmt.Println(infoGeneral)
+	fmt.Println(infoHogar)
 	if err != nil {
 		e.Logger.Error(err)
 		response := map[string]any{
