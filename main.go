@@ -124,7 +124,7 @@ func main() {
 		err = dbConnection.QueryRow("SELECT * FROM mascotas WHERE ID = ?", id).Scan(&mascota.Id, &mascota.Nombre, &mascota.Edad, &mascota.Altura_cm, &mascota.Foto64, &mascota.Descripcion)
 		if err != nil {
 			e.Logger.Error(err)
-			return Mascota{}, err
+			return Mascota{}, fmt.Errorf("Mascota con id %v no encontrada", id)
 		}
 		return mascota, nil
 	}
@@ -148,12 +148,7 @@ func main() {
 		return c.Render(http.StatusNotFound, "error", response)
 	})
 
-	// Nombre:    nombre,
-	// Edad:      edad,
-	// Email:     email,
-	// Direccion: direccion,
-	// Telefono:  telefono,
-	infoGeneral := func(nombre, edad, email, direccion, telefono string) (InformacionGeneral, error) {
+	validarInfoGeneral := func(nombre, edad, email, direccion, telefono string) (InformacionGeneral, error) {
 		if nombre == "" {
 			e.Logger.Errorf("Nombre no solicitado")
 			return InformacionGeneral{}, fmt.Errorf("Nombre no solicitado")
@@ -193,7 +188,51 @@ func main() {
 		}, nil
 	}
 
+	validarInfoHogar := func(tipoDeVivienda, esPropiedadVivienda, tienePatio, personasEnHogar string) (InformacionHogar, error) {
+		personasEnHogar_d, err := strconv.Atoi(personasEnHogar)
+		if err != nil {
+			e.Logger.Error(err)
+			return InformacionHogar{}, fmt.Errorf("Personas en hogar no procesable")
+		}
+		// error handling
+		if tipoDeVivienda == "" {
+			e.Logger.Errorf("Tipo de vivienda sin texto")
+			return InformacionHogar{}, fmt.Errorf("Tipo de vivienda sin texto")
+		}
+		var esPropiedadVivienda_d bool
+		switch esPropiedadVivienda {
+		case "Si":
+			esPropiedadVivienda_d = true
+		case "No":
+			esPropiedadVivienda_d = false
+		default:
+			e.Logger.Errorf("Es propiedad vivienda sin respuesta")
+			return InformacionHogar{}, fmt.Errorf("Es propiedad vivienda sin respuesta")
+		}
+		var tienePatio_d bool
+		switch tienePatio {
+		case "Si":
+			tienePatio_d = true
+		case "No":
+			tienePatio_d = false
+		default:
+			e.Logger.Errorf("Tiene patio respuesta no procesable")
+			return InformacionHogar{}, fmt.Errorf("Tiene patio respuesta no procesable")
+		}
+		if personasEnHogar_d < 1 {
+			e.Logger.Errorf("Personas en hogar no puede ser menor a 1")
+			return InformacionHogar{}, fmt.Errorf("Personas en hogar no puede ser menor a 1")
+		}
+		return InformacionHogar{
+			TipoDeVivienda:      tipoDeVivienda,
+			EsPropiedadVivienda: esPropiedadVivienda_d,
+			TienePatio:          tienePatio_d,
+			PersonasEnHogar:     personasEnHogar_d,
+		}, nil
+	}
+
 	// ------------------------- GET -------------------------
+
 	e.GET("/", func(c echo.Context) error {
 		fmt.Printf("GET /\n")
 		rows, err := dbConnection.Query("SELECT * FROM mascotas LIMIT 3")
@@ -334,6 +373,7 @@ func main() {
 	})
 
 	// ------------------------- POST -------------------------
+
 	e.POST("/adopcion/info-general/:id", func(c echo.Context) error {
 		pId, err := strconv.Atoi(c.Param("id"))
 		if err != nil {
@@ -347,79 +387,19 @@ func main() {
 		}
 		fmt.Printf("POST /adopcion/info-general/%v\n", pId)
 		nombre := c.FormValue("nombre")
-		if nombre == "" {
-			e.Logger.Errorf("nombre: %v", nombre)
-			response := map[string]any{
-				"URL":     URL,
-				"Code":    http.StatusUnauthorized,
-				"Message": "nombre no solicitado",
-			}
-			return c.Render(http.StatusUnauthorized, "error", response)
-		}
-		edad, err := strconv.Atoi(c.FormValue("edad"))
-		if err != nil {
-			e.Logger.Error(err)
-			response := map[string]any{
-				"URL":     URL,
-				"Code":    http.StatusUnprocessableEntity,
-				"Message": "Edad no procesable",
-			}
-			return c.Render(http.StatusUnprocessableEntity, "error", response)
-		}
-		if edad < 18 || edad > 100 {
-			e.Logger.Errorf("edad: %v", edad)
-			response := map[string]any{
-				"URL":     URL,
-				"Code":    http.StatusUnauthorized,
-				"Message": "Edad no es valida",
-			}
-			return c.Render(http.StatusUnauthorized, "error", response)
-		}
+		edad := c.FormValue("edad")
 		email := c.FormValue("email")
-		if email == "" {
-			e.Logger.Errorf("email: %v", email)
-			response := map[string]any{
-				"URL":     URL,
-				"Code":    http.StatusUnauthorized,
-				"Message": "Email no solicitado",
-			}
-			return c.Render(http.StatusUnauthorized, "error", response)
-		}
 		direccion := c.FormValue("direccion")
-		if direccion == "" {
-			e.Logger.Errorf("direccion: %v", direccion)
-			response := map[string]any{
-				"URL":     URL,
-				"Code":    http.StatusUnauthorized,
-				"Message": "Direccion no solicitada",
-			}
-			return c.Render(http.StatusUnauthorized, "error", response)
-		}
-		telefono, err := strconv.Atoi(c.FormValue("telefono"))
+		telefono := c.FormValue("telefono")
+		informacionGeneral, err := validarInfoGeneral(nombre, edad, email, direccion, telefono)
 		if err != nil {
 			e.Logger.Error(err)
 			response := map[string]any{
 				"URL":     URL,
-				"Code":    http.StatusUnprocessableEntity,
-				"Message": "telefono no procesable",
+				"Code":    http.StatusBadRequest,
+				"Message": err,
 			}
-			return c.Render(http.StatusUnprocessableEntity, "error", response)
-		}
-		if telefono < 1_000_000_000 || telefono > 9_999_999_999 {
-			e.Logger.Errorf("telefono: %v", telefono)
-			response := map[string]any{
-				"URL":     URL,
-				"Code":    http.StatusUnauthorized,
-				"Message": "Telefono debe tener 10 digitos",
-			}
-			return c.Render(http.StatusUnauthorized, "error", response)
-		}
-		informacionGeneral := InformacionGeneral{
-			Nombre:    nombre,
-			Edad:      edad,
-			Email:     email,
-			Direccion: direccion,
-			Telefono:  telefono,
+			return c.Render(http.StatusBadRequest, "error", response)
 		}
 		_, err = getMascotaById(pId)
 		if err != nil {
@@ -452,86 +432,31 @@ func main() {
 		}
 		fmt.Printf("POST /adopcion/info-hogar/%v\n", pId)
 		tipoDeVivienda := c.FormValue("tipo-de-vivienda")
-		esPropiedadViviendaRespuesta := c.FormValue("is-propiedad-propia")
-		tienePatioRespuesta := c.FormValue("tiene-patio")
-		// TODO query params para esto pls :ccc
+		esPropiedadVivienda := c.FormValue("is-propiedad-propia")
+		personasEnHogar := c.FormValue("personas-en-hogar")
+		tienePatio := c.FormValue("tiene-patio")
+		// query params
 		nombre := c.QueryParam("nombre")
 		edad := c.QueryParam("edad")
 		email := c.QueryParam("email")
 		direccion := c.QueryParam("direccion")
 		telefono := c.QueryParam("telefono")
-		fmt.Printf("query params: %v %v %v %v %v", nombre, edad, email, direccion, telefono)
-		personasEnHogar, err := strconv.Atoi(c.FormValue("personas-en-hogar"))
+		infoGeneral, err := validarInfoGeneral(nombre, edad, email, direccion, telefono)
+		infoHogar, err := validarInfoHogar(tipoDeVivienda, esPropiedadVivienda, tienePatio, personasEnHogar)
 		if err != nil {
 			e.Logger.Error(err)
 			response := map[string]any{
 				"URL":     URL,
-				"Code":    http.StatusUnprocessableEntity,
-				"Message": "Personas en hogar no procesable",
+				"Code":    http.StatusBadRequest,
+				"Message": err,
 			}
-			return c.Render(http.StatusUnprocessableEntity, "error", response)
-		}
-		// error handling
-		if tipoDeVivienda == "" {
-			e.Logger.Errorf("tipo de vivienda: %v", tipoDeVivienda)
-			response := map[string]any{
-				"URL":     URL,
-				"Code":    http.StatusUnprocessableEntity,
-				"Message": "Tipo de vivienda sin texto",
-			}
-			return c.Render(http.StatusUnprocessableEntity, "error", response)
-		}
-		var esPropiedadVivienda bool
-		switch esPropiedadViviendaRespuesta {
-		case "Si":
-			esPropiedadVivienda = true
-		case "No":
-			esPropiedadVivienda = false
-		default:
-			e.Logger.Errorf("es propiedad de vivienda: %v", esPropiedadViviendaRespuesta)
-			response := map[string]any{
-				"URL":     URL,
-				"Code":    http.StatusUnprocessableEntity,
-				"Message": "Es propiedad vivienda sin respuesta",
-			}
-			return c.Render(http.StatusUnprocessableEntity, "error", response)
-		}
-		var tienePatio bool
-		switch tienePatioRespuesta {
-		case "Si":
-			tienePatio = true
-		case "No":
-			tienePatio = false
-		default:
-			e.Logger.Errorf("tiene patio: ", tienePatioRespuesta)
-			response := map[string]any{
-				"URL":     URL,
-				"Code":    http.StatusUnprocessableEntity,
-				"Message": "Tiene patio respuesta no procesable",
-			}
-			return c.Render(http.StatusUnprocessableEntity, "error", response)
-		}
-		if personasEnHogar < 1 {
-			e.Logger.Errorf("personas en hogar: %v", personasEnHogar)
-			response := map[string]any{
-				"URL":     URL,
-				"Code":    http.StatusUnprocessableEntity,
-				"Message": "Personas en hogar no puede ser menor a 1",
-			}
-			return c.Render(http.StatusUnprocessableEntity, "error", response)
-		}
-		// tipoDeVivienda, esPropiedadVivienda, tienePatio, personasEnHogar
-		informacionHogar := InformacionHogar{
-			TipoDeVivienda:      tipoDeVivienda,
-			EsPropiedadVivienda: esPropiedadVivienda,
-			TienePatio:          tienePatio,
-			PersonasEnHogar:     personasEnHogar,
+			return c.Render(http.StatusBadRequest, "error", response)
 		}
 		response := map[string]any{
 			"URL":                URL,
 			"MascotaId":          pId,
-			"InformacionGeneral": nil,
-			"InformacionHogar":   informacionHogar,
+			"InformacionGeneral": infoGeneral,
+			"InformacionHogar":   infoHogar,
 		}
 		return c.Render(http.StatusOK, "experienciaConMascotas", response)
 	})
