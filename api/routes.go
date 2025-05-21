@@ -210,8 +210,6 @@ func postInfoHogar(c echo.Context) error {
 		return c.Render(http.StatusBadRequest, "error", response)
 	}
 	infoHogar, err := database.ValidarInfoHogar(tipoDeVivienda, esPropiedadVivienda, tienePatio, personasEnHogar)
-	fmt.Println(infoGeneral)
-	fmt.Println(infoHogar)
 	if err != nil {
 		e.Logger.Error(err)
 		response := map[string]any{
@@ -221,6 +219,8 @@ func postInfoHogar(c echo.Context) error {
 		}
 		return c.Render(http.StatusBadRequest, "error", response)
 	}
+	fmt.Println(infoGeneral)
+	fmt.Println(infoHogar)
 	response := map[string]any{
 		"URL":                _URL,
 		"MascotaId":          pId,
