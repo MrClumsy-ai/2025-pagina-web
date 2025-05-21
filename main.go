@@ -394,7 +394,6 @@ func main() {
 		return c.Render(http.StatusOK, "informacionHogar", response)
 	})
 
-	// TODO: POST para /adopcion/info-hogar/:id (desde informacionHogar.tmpl)
 	e.POST("/adopcion/info-hogar/:id", func(c echo.Context) error {
 		pId, err := strconv.Atoi(c.Param("id"))
 		if err != nil {
@@ -412,7 +411,11 @@ func main() {
 		tienePatioRespuesta := c.FormValue("tiene-patio")
 		// TODO query params para esto pls :ccc
 		nombre := c.QueryParam("nombre")
-		fmt.Printf("nombre: %v", nombre)
+		edad := c.QueryParam("edad")
+		email := c.QueryParam("email")
+		direccion := c.QueryParam("direccion")
+		telefono := c.QueryParam("telefono")
+		fmt.Printf("query params: %v %v %v %v %v", nombre, edad, email, direccion, telefono)
 		personasEnHogar, err := strconv.Atoi(c.FormValue("personas-en-hogar"))
 		if err != nil {
 			e.Logger.Error(err)
