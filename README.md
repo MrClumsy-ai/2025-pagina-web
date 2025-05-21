@@ -75,12 +75,18 @@ git pull --rebase
 git push
 ```
 15. Si es que sale algún error en
-```git pull --rebase```
+```
+git pull --rebase
+```
 abortar el rebase usando
-```git rebase --abort```
-usar ahora un git pull regular y arreglar los conflictos de merge
-```git pull```
-una vez resueltos los conflictos, hacer otro commit con el mensaje de "merge"
+```
+git rebase --abort
+```
+Usar ahora un git pull regular y arreglar los conflictos de merge
+```
+git pull
+```
+Una vez resueltos los conflictos, hacer otro commit con el mensaje de "merge"
 ```
 git add .
 git commit -m "merge"
