@@ -13,24 +13,24 @@
         <p>Completa la siguiente informacion para comenzar el proceso de adopcion</p>
         <div class="container">
           <h2>Experiencia con mascotas</h2>
-          <form method="post" action="{{ .URL }}/adopcion/info-hogar/{{ .MascotaId }}">
-            <label for="tipo-de-vivienda">Tipo de vivienda</label>
-            <input type="text" name="tipo-de-vivienda" />
-            <br />
-            <label for="is-propiedad-propia">Vive en propiedad propia?</label>
-              <select name="is-propiedad-propia">
+          <form method="post" action="{{ .URL }}/adopcion/experiencia-mascotas/{{ .MascotaId }}?nombre={{ .InformacionGeneral.Nombre }}?edad={{ .InformacionGeneral.Edad }}?email={{ .InformacionGeneral.Email }}?direccion={{ .InformacionGeneral.Direccion }}?telefono={{ .InformacionGeneral.Telefono }}">
+            <label for="mascotas-anteriormente">Ha tenido mascotas anteriormente?</label>
+              <select name="mascotas-anteriormente">
               <option value="Si">Si</option>
               <option value="No">No</option>
             </select>
             <br />
-            <label for="tiene-patio">Cuenta con patio? (espacio con aire libre)</label>
-            <select name="tiene-patio">
+            <label for="tiene-mascotas">Actualmente tiene otras mascotas?</label>
+            <select name="tiene-mascotas">
               <option value="Si">Si</option>
               <option value="No">No</option>
             </select>
             <br />
-            <label for="personas-en-hogar">Cuantas personas viven en el hogar?</label>
-            <input type="number" name="personas-en-hogar" />
+            <label for="tiene-veterinario">Cuenta con veterinario de confianza?</label>
+            <select name="tiene-veterinario">
+              <option value="Si">Si</option>
+              <option value="No">No</option>
+            </select>
             <br />
             <button class="button p-4 rounded-pill" type="submit">Siguiente</button>
           </form>

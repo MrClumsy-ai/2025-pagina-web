@@ -483,9 +483,10 @@ func main() {
 			PersonasEnHogar:     personasEnHogar,
 		}
 		response := map[string]any{
-			"URL":              URL,
-			"MascotaId":        pId,
-			"InformacionHogar": informacionHogar,
+			"URL":                URL,
+			"MascotaId":          pId,
+			"InformacionGeneral": nil,
+			"InformacionHogar":   informacionHogar,
 		}
 		return c.Render(http.StatusOK, "experienciaConMascotas", response)
 	})
