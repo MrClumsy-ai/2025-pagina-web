@@ -1,27 +1,32 @@
 # TODO
 
-- [ ] que hace el boton de "solicitar adopcion"?
+- [ ] solicitud de adopcion
 - [ ] que hace contacto?
+- [ ] css para registrar.tmpl
+- [ ] css para solicitudAdopcion.tmpl
+- [ ] css para experienciaConMascotas.tmpl
+- [ ] css para informacionHogar.tmpl
 
 ## Para iniciar el servidor:
 
 1. Instalar golang: https://go.dev/doc/install
-2. Ir al directorio en una terminal e instalar todos los paquetes del proyecto
+2. Instalar sqlite3: https://www.sqlite.org/download.html
+3. Ir al directorio en una terminal e instalar todos los paquetes del proyecto
 
 ```
 cd ubicacion/del/proyecto
 go mod tidy
 ```
 
-3. Correr el servidor con go run
+4. Correr el servidor con go run
 
 ```
 go run main.go
 ```
 
-4. Ir a la ubicacion desde un navegador web: http://localhost:8000/
+5. Ir a la ubicacion desde un navegador web: http://localhost:8000/
 
-5. Una vez que se hagan cambios, reiniciar el servidor, usando Ctrl + C en la linea de comandos y regresar al paso 3
+6. Una vez que se hagan cambios, reiniciar el servidor, usando <kbd>Ctrl</kbd> + <kbd>C</kbd> en la linea de comandos y regresar al paso 4
 
 ## Para trabajar
 
