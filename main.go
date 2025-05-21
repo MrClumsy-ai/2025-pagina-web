@@ -45,7 +45,6 @@ type InformacionGeneral struct {
 	Telefono  int    `form:"telefono" json:"telefono"`
 }
 
-// tipoDeVivienda, esPropiedadVivienda, tienePatio, personasEnHogar
 type InformacionHogar struct {
 	TipoDeVivienda      string `form:"tipo-de-vivienda" json:"tipo-de-vivienda"`
 	EsPropiedadVivienda bool   `form:"is-propiedad-vivienda" json:"is-propiedad-vivienda"`
@@ -147,89 +146,6 @@ func main() {
 		}
 		return c.Render(http.StatusNotFound, "error", response)
 	})
-
-	validarInfoGeneral := func(nombre, edad, email, direccion, telefono string) (InformacionGeneral, error) {
-		if nombre == "" {
-			e.Logger.Errorf("Nombre no solicitado")
-			return InformacionGeneral{}, fmt.Errorf("Nombre no solicitado")
-		}
-		edad_p, err := strconv.Atoi(edad)
-		if err != nil {
-			e.Logger.Error(err)
-			return InformacionGeneral{}, fmt.Errorf("Edad no procesable")
-		}
-		if edad_p < 18 || edad_p > 100 {
-			e.Logger.Errorf("Edad no es valida")
-			return InformacionGeneral{}, fmt.Errorf("Edad no es valida")
-		}
-		if email == "" {
-			e.Logger.Errorf("Email no solicitado")
-			return InformacionGeneral{}, fmt.Errorf("Email no solicitado")
-		}
-		if direccion == "" {
-			e.Logger.Errorf("Direccion no solicitada")
-			return InformacionGeneral{}, fmt.Errorf("Direccion no solicitada")
-		}
-		telefono_p, err := strconv.Atoi(telefono)
-		if err != nil {
-			e.Logger.Error(err)
-			return InformacionGeneral{}, err
-		}
-		if telefono_p < 1_000_000_000 || telefono_p > 9_999_999_999 {
-			e.Logger.Errorf("Telefono debe tener 10 digitos")
-			return InformacionGeneral{}, fmt.Errorf("Telefono debe tener 10 digitos")
-		}
-		return InformacionGeneral{
-			Nombre:    nombre,
-			Edad:      edad_p,
-			Email:     email,
-			Direccion: direccion,
-			Telefono:  telefono_p,
-		}, nil
-	}
-
-	validarInfoHogar := func(tipoDeVivienda, esPropiedadVivienda, tienePatio, personasEnHogar string) (InformacionHogar, error) {
-		personasEnHogar_d, err := strconv.Atoi(personasEnHogar)
-		if err != nil {
-			e.Logger.Error(err)
-			return InformacionHogar{}, fmt.Errorf("Personas en hogar no procesable")
-		}
-		// error handling
-		if tipoDeVivienda == "" {
-			e.Logger.Errorf("Tipo de vivienda sin texto")
-			return InformacionHogar{}, fmt.Errorf("Tipo de vivienda sin texto")
-		}
-		var esPropiedadVivienda_d bool
-		switch esPropiedadVivienda {
-		case "Si":
-			esPropiedadVivienda_d = true
-		case "No":
-			esPropiedadVivienda_d = false
-		default:
-			e.Logger.Errorf("Es propiedad vivienda sin respuesta")
-			return InformacionHogar{}, fmt.Errorf("Es propiedad vivienda sin respuesta")
-		}
-		var tienePatio_d bool
-		switch tienePatio {
-		case "Si":
-			tienePatio_d = true
-		case "No":
-			tienePatio_d = false
-		default:
-			e.Logger.Errorf("Tiene patio respuesta no procesable")
-			return InformacionHogar{}, fmt.Errorf("Tiene patio respuesta no procesable")
-		}
-		if personasEnHogar_d < 1 {
-			e.Logger.Errorf("Personas en hogar no puede ser menor a 1")
-			return InformacionHogar{}, fmt.Errorf("Personas en hogar no puede ser menor a 1")
-		}
-		return InformacionHogar{
-			TipoDeVivienda:      tipoDeVivienda,
-			EsPropiedadVivienda: esPropiedadVivienda_d,
-			TienePatio:          tienePatio_d,
-			PersonasEnHogar:     personasEnHogar_d,
-		}, nil
-	}
 
 	// ------------------------- GET -------------------------
 
@@ -771,4 +687,74 @@ func main() {
 	})
 
 	e.Logger.Fatal(e.Start(PORT))
+}
+
+func validarInfoGeneral(nombre, edad, email, direccion, telefono string) (InformacionGeneral, error) {
+	if nombre == "" {
+		return InformacionGeneral{}, fmt.Errorf("Nombre no solicitado")
+	}
+	edad_p, err := strconv.Atoi(edad)
+	if err != nil {
+		return InformacionGeneral{}, fmt.Errorf("Edad no procesable")
+	}
+	if edad_p < 18 || edad_p > 100 {
+		return InformacionGeneral{}, fmt.Errorf("Edad no es valida")
+	}
+	if email == "" {
+		return InformacionGeneral{}, fmt.Errorf("Email no solicitado")
+	}
+	if direccion == "" {
+		return InformacionGeneral{}, fmt.Errorf("Direccion no solicitada")
+	}
+	telefono_p, err := strconv.Atoi(telefono)
+	if err != nil {
+		return InformacionGeneral{}, err
+	}
+	if telefono_p < 1_000_000_000 || telefono_p > 9_999_999_999 {
+		return InformacionGeneral{}, fmt.Errorf("Telefono debe tener 10 digitos")
+	}
+	return InformacionGeneral{
+		Nombre:    nombre,
+		Edad:      edad_p,
+		Email:     email,
+		Direccion: direccion,
+		Telefono:  telefono_p,
+	}, nil
+}
+func validarInfoHogar(tipoDeVivienda, esPropiedadVivienda, tienePatio, personasEnHogar string) (InformacionHogar, error) {
+	personasEnHogar_d, err := strconv.Atoi(personasEnHogar)
+	if err != nil {
+		return InformacionHogar{}, fmt.Errorf("Personas en hogar no procesable")
+	}
+	// error handling
+	if tipoDeVivienda == "" {
+		return InformacionHogar{}, fmt.Errorf("Tipo de vivienda sin texto")
+	}
+	var esPropiedadVivienda_d bool
+	switch esPropiedadVivienda {
+	case "Si":
+		esPropiedadVivienda_d = true
+	case "No":
+		esPropiedadVivienda_d = false
+	default:
+		return InformacionHogar{}, fmt.Errorf("Es propiedad vivienda sin respuesta")
+	}
+	var tienePatio_d bool
+	switch tienePatio {
+	case "Si":
+		tienePatio_d = true
+	case "No":
+		tienePatio_d = false
+	default:
+		return InformacionHogar{}, fmt.Errorf("Tiene patio respuesta no procesable")
+	}
+	if personasEnHogar_d < 1 {
+		return InformacionHogar{}, fmt.Errorf("Personas en hogar no puede ser menor a 1")
+	}
+	return InformacionHogar{
+		TipoDeVivienda:      tipoDeVivienda,
+		EsPropiedadVivienda: esPropiedadVivienda_d,
+		TienePatio:          tienePatio_d,
+		PersonasEnHogar:     personasEnHogar_d,
+	}, nil
 }
