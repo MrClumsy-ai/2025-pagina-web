@@ -332,6 +332,7 @@ func main() {
 		return c.Render(http.StatusOK, "mascotas", response)
 	})
 
+	// TODO: modificar esta ruta para otra tmpl renderizada
 	e.GET("/mascotas/:id", func(c echo.Context) error {
 		pId, err := strconv.Atoi(c.Param("id"))
 		if err != nil {
