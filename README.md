@@ -74,11 +74,7 @@ git commit -m "mensaje corto describiendo tus cambios" -m "mensaje mas largo des
 git pull --rebase
 git push
 ```
-15. Si es que sale algún error en
-```
-git pull --rebase
-```
-abortar el rebase usando
+15. Si es que sale algún error en ```git pull --rebase```, abortar el rebase usando
 ```
 git rebase --abort
 ```
