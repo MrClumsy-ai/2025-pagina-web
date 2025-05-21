@@ -148,6 +148,51 @@ func main() {
 		return c.Render(http.StatusNotFound, "error", response)
 	})
 
+	// Nombre:    nombre,
+	// Edad:      edad,
+	// Email:     email,
+	// Direccion: direccion,
+	// Telefono:  telefono,
+	infoGeneral := func(nombre, edad, email, direccion, telefono string) (InformacionGeneral, error) {
+		if nombre == "" {
+			e.Logger.Errorf("Nombre no solicitado")
+			return InformacionGeneral{}, fmt.Errorf("Nombre no solicitado")
+		}
+		edad_p, err := strconv.Atoi(edad)
+		if err != nil {
+			e.Logger.Error(err)
+			return InformacionGeneral{}, fmt.Errorf("Edad no procesable")
+		}
+		if edad_p < 18 || edad_p > 100 {
+			e.Logger.Errorf("Edad no es valida")
+			return InformacionGeneral{}, fmt.Errorf("Edad no es valida")
+		}
+		if email == "" {
+			e.Logger.Errorf("Email no solicitado")
+			return InformacionGeneral{}, fmt.Errorf("Email no solicitado")
+		}
+		if direccion == "" {
+			e.Logger.Errorf("Direccion no solicitada")
+			return InformacionGeneral{}, fmt.Errorf("Direccion no solicitada")
+		}
+		telefono_p, err := strconv.Atoi(telefono)
+		if err != nil {
+			e.Logger.Error(err)
+			return InformacionGeneral{}, err
+		}
+		if telefono_p < 1_000_000_000 || telefono_p > 9_999_999_999 {
+			e.Logger.Errorf("Telefono debe tener 10 digitos")
+			return InformacionGeneral{}, fmt.Errorf("Telefono debe tener 10 digitos")
+		}
+		return InformacionGeneral{
+			Nombre:    nombre,
+			Edad:      edad_p,
+			Email:     email,
+			Direccion: direccion,
+			Telefono:  telefono_p,
+		}, nil
+	}
+
 	// ------------------------- GET -------------------------
 	e.GET("/", func(c echo.Context) error {
 		fmt.Printf("GET /\n")
