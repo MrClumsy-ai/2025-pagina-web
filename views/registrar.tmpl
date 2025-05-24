@@ -9,27 +9,21 @@
   </head>
   <body>
     {{ template "navbar" . }}
-    <main class="container-fluid" style="margin-top: 80px">
-      <div class="container">
-        <form action="{{ .URL }}/mascotas" method="post" enctype="multipart/form-data">
-          <label for="nombre">Nombre: </label>
-          <input name="nombre" type="text" placeholder="nombre" required /> <br />
-
-          <label for="edad">Edad: </label>
-          <input name="edad" type="number" placeholder="edad" /> <br />
-
-          <label for="altura">Altura (cm): </label>
-          <input name="altura" type="number" placeholder="altura" /> <br />
-
-          <label for="foto">Foto: </label>
-          <input name="foto" type="file" accept="image/*" required /> <br />
-
-          <label for="descripcion">Descripcion: </label>
-          <input name="descripcion" type="text" placeholder="descripcion" /> <br />
-
-          <button type="submit" class="p-4 rounded-pill">submit</button>
-        </form>
-      </div>
+    <main class="container" style="margin-top: 80px">
+      <h1>Registrar mascota</h1>
+      <form action="{{ .URL }}/mascotas" method="post" enctype="multipart/form-data">
+        <label for="nombre">Nombre: </label>
+        <input name="nombre" type="text" placeholder="nombre" required /> <br />
+        <label for="edad">Edad: </label>
+        <input name="edad" type="number" placeholder="edad" /> <br />
+        <label for="altura">Altura (cm): </label>
+        <input name="altura" type="number" placeholder="altura" /> <br />
+        <label for="foto">Foto: </label>
+        <input name="foto" type="file" accept="image/*" required /> <br />
+        <label for="descripcion">Descripcion: </label>
+        <input name="descripcion" type="text" placeholder="descripcion" /> <br />
+        <button type="submit" class="p-4 rounded-pill">submit</button>
+      </form>
     </main>
   </body>
 </html>

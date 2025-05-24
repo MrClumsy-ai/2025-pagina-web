@@ -44,6 +44,7 @@ main button,
   transition-duration: 0.2s;
   box-shadow: 2px 2px var(--negro);
   text-decoration: none;
+  text-align: center;
 }
 
 main button:hover,
