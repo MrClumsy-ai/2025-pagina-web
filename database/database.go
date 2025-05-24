@@ -43,14 +43,13 @@ func (r *DbRepository) Connect() error {
 
 		mascotasAnteriormente INT NOT NULL,
 		tieneMascotas TEXT NOT NULL,
-		tieneVeterinario int not null,
+		tieneVeterinario INT NOT NULL,
 
 		cuidadosNecesarios INT NOT NULL,
 		visitasSeguimiento INT NOT NULL,
 		responsabilidad INT NOT NULL,
 
-		firma TEXT NOT NULL,
-		fecha DATE NOT
+		firma TEXT NOT NULL
 	)`)
 	if err != nil {
 		return err

@@ -138,8 +138,8 @@ func getRegistrar(c echo.Context) error {
 }
 
 func postAdopcion(c echo.Context) error {
-	fmt.Printf("POST /adopcion/\n")
 	pId, err := strconv.Atoi(c.Param("id"))
+	fmt.Printf("POST /adopcion/%v\n", pId)
 	if err != nil {
 		e.Logger.Error(err)
 		response := map[string]any{
@@ -149,7 +149,6 @@ func postAdopcion(c echo.Context) error {
 		}
 		return c.Render(http.StatusInternalServerError, "error", response)
 	}
-	fmt.Printf("id: %v\n", pId)
 	mascota, err := repository.GetMascotaById(pId)
 	if err != nil {
 		e.Logger.Error(err)
