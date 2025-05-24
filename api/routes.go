@@ -149,12 +149,44 @@ func postInfoGeneral(c echo.Context) error {
 		return c.Render(http.StatusInternalServerError, "error", response)
 	}
 	fmt.Printf("POST /adopcion/info-general/%v\n", pId)
+	// info general
 	nombre := c.FormValue("nombre")
 	edad := c.FormValue("edad")
 	email := c.FormValue("email")
 	direccion := c.FormValue("direccion")
 	telefono := c.FormValue("telefono")
-	informacionGeneral, err := database.ValidarInfoGeneral(nombre, edad, email, direccion, telefono)
+	// info hogar
+	tipoDeVivienda := c.FormValue("tipo-de-vivienda")
+	esPropiedadVivienda := c.FormValue("is-propiedad-propia")
+	personasEnHogar := c.FormValue("personas-en-hogar")
+	tienePatio := c.FormValue("tiene-patio")
+	// experiencia-mascotas
+	mascotasAnteriormente := c.FormValue("mascotas-anteriormente")
+	tieneMascotas := c.FormValue("tiene-mascotas")
+	tieneVeterinario := c.FormValue("tiene-veterinario")
+
+	// error checking
+	infoGeneral, err := database.ValidarInfoGeneral(nombre, edad, email, direccion, telefono)
+	if err != nil {
+		e.Logger.Error(err)
+		response := map[string]any{
+			"URL":     _URL,
+			"Code":    http.StatusBadRequest,
+			"Message": err,
+		}
+		return c.Render(http.StatusBadRequest, "error", response)
+	}
+	infoHogar, err := database.ValidarInfoHogar(tipoDeVivienda, esPropiedadVivienda, tienePatio, personasEnHogar)
+	if err != nil {
+		e.Logger.Error(err)
+		response := map[string]any{
+			"URL":     _URL,
+			"Code":    http.StatusBadRequest,
+			"Message": err,
+		}
+		return c.Render(http.StatusBadRequest, "error", response)
+	}
+	experienciaMascotas, err := database.ValidarExperienciaMascotas(mascotasAnteriormente, tieneMascotas, tieneVeterinario)
 	if err != nil {
 		e.Logger.Error(err)
 		response := map[string]any{
@@ -175,9 +207,11 @@ func postInfoGeneral(c echo.Context) error {
 		return c.Render(http.StatusNotFound, "error", response)
 	}
 	response := map[string]any{
-		"URL":                _URL,
-		"InformacionGeneral": informacionGeneral,
-		"MascotaId":          pId,
+		"URL":                 _URL,
+		"MascotaId":           pId,
+		"InfoGeneral":         infoGeneral,
+		"InfoHogar":           infoHogar,
+		"experienciaMascotas": experienciaMascotas,
 	}
 	return c.Render(http.StatusOK, "informacionHogar", response)
 }
@@ -235,7 +269,6 @@ func postInfoHogar(c echo.Context) error {
 	return c.Render(http.StatusOK, "experienciaConMascotas", response)
 }
 
-// TODO seguir aqui
 func postExperienciaMascotas(c echo.Context) error {
 	return c.JSON(http.StatusOK, "/adopcion/experiencia-mascotas/:id")
 }

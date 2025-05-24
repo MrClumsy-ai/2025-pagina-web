@@ -20,6 +20,12 @@ type InformacionHogar struct {
 	PersonasEnHogar     int    `form:"personas-en-hogar" json:"personas-en-hogar"`
 }
 
+type ExperienciaMascotas struct {
+	MascotasAnteriormente bool `form:"mascotas-anteriormente" json:"mascotas-anteriormente"`
+	TieneMascotas         bool `form:"tiene-mascotas" json:"tiene-mascotas"`
+	TieneVeterinario      bool `form:"tiene-veterinario" json:"tiene-veterinario"`
+}
+
 func ValidarInfoGeneral(nombre, edad, email, direccion, telefono string) (InformacionGeneral, error) {
 	if nombre == "" {
 		return InformacionGeneral{}, fmt.Errorf("Nombre no solicitado")
@@ -89,4 +95,35 @@ func ValidarInfoHogar(tipoDeVivienda, esPropiedadVivienda, tienePatio, personasE
 		TienePatio:          tienePatio_d,
 		PersonasEnHogar:     personasEnHogar_d,
 	}, nil
+}
+
+func ValidarExperienciaMascotas(mascotasAnteriormente, tieneMascotas, tieneVeterinario string) (ExperienciaMascotas, error) {
+	var mascotasAnteriormente_d bool
+	switch mascotasAnteriormente {
+	case "Si":
+		mascotasAnteriormente_d = true
+	case "No":
+		mascotasAnteriormente_d = false
+	default:
+		return ExperienciaMascotas{}, fmt.Errorf("mascotas anteriormente respuesta no procesable")
+	}
+	var tieneMascotas_d bool
+	switch tieneMascotas {
+	case "Si":
+		tieneMascotas_d = true
+	case "No":
+		tieneMascotas_d = false
+	default:
+		return ExperienciaMascotas{}, fmt.Errorf("tiene mascotas respuesta no procesable")
+	}
+	var tieneVeterinario_d bool
+	switch tieneVeterinario {
+	case "Si":
+		tieneVeterinario_d = true
+	case "No":
+		tieneVeterinario_d = false
+	default:
+		return ExperienciaMascotas{}, fmt.Errorf("tiene veterinario respuesta no procesable")
+	}
+	return ExperienciaMascotas{MascotasAnteriormente: mascotasAnteriormente_d, TieneMascotas: tieneMascotas_d, TieneVeterinario: tieneVeterinario_d}, nil
 }

@@ -66,8 +66,8 @@ func StartServer(url, port string) {
 	e.GET("/mascotas/:id", getMascotaById)
 	e.GET("/registrar", getRegistrar)
 	e.POST("/adopcion/info-general/:id", postInfoGeneral)
-	e.POST("/adopcion/info-hogar/:id", postInfoHogar)
-	e.POST("/adopcion/experiencia-mascotas/:id", postExperienciaMascotas)
+	// e.POST("/adopcion/info-hogar/:id", postInfoHogar)
+	// e.POST("/adopcion/experiencia-mascotas/:id", postExperienciaMascotas)
 	e.POST("/contacto", postContacto)
 	e.POST("/mascotas", postMascota)
 
