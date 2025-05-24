@@ -41,7 +41,12 @@ func getAdopcionById(c echo.Context) error {
 	pId, err := strconv.Atoi(c.Param("id"))
 	if err != nil {
 		e.Logger.Error(err)
-		return c.JSON(http.StatusInternalServerError, nil)
+		response := map[string]any{
+			"URL":     _URL,
+			"Code":    http.StatusBadRequest,
+			"Message": err,
+		}
+		return c.Render(http.StatusBadRequest, "error", response)
 	}
 	fmt.Printf("GET /adopcion/%v\n", pId)
 	mascota, err := repository.GetMascotaById(pId)
@@ -59,7 +64,7 @@ func getAdopcionById(c echo.Context) error {
 		"CurrentRoute": "/adopcion",
 		"Mascota":      mascota,
 	}
-	return c.Render(http.StatusOK, "solicitudAdopcion", response)
+	return c.Render(http.StatusOK, "solicitudAdopcion2", response)
 }
 
 func getContacto(c echo.Context) error {

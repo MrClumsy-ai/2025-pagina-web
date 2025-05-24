@@ -12,10 +12,9 @@
       <div class="container">
         <h1>Formulario de adopcion</h1>
         <p>Completa la siguiente informacion para comenzar el proceso de adopcion</p>
-        <!-- {{ template "mascota" .Mascota }} -->
-        <div class="container">
-          <h2>Informacion general</h2>
-          <form method="post" action="{{ .URL }}/adopcion/info-general/{{ .Mascota.Id }}">
+        <form method="post" action="{{ .URL }}/adopcion/{{ .Mascota.Id }}">
+          <div class="container" id="informacion-general">
+            <h2>Informacion general</h2>
             <label for="nombre">Nombre:</label>
             <input type="text" name="nombre" required/>
             <br />
@@ -30,9 +29,85 @@
             <label for="telefono">Numero telefonico:</label>
             <input type="number" name="telefono" required/>
             <br />
-            <button class="button p-4 rounded-pill" type="submit">Siguiente</button>
-          </form>
-        </div>
+          </div>
+
+          <div class="container" id="informacion-hogar">
+            <h2>Informacion del hogar</h2>
+            <label for="tipo-de-vivienda">Tipo de vivienda</label>
+            <input type="text" name="tipo-de-vivienda" />
+            <br />
+            <label for="is-propiedad-propia">Vive en propiedad propia?</label>
+              <select name="is-propiedad-propia">
+              <option value="Si">Si</option>
+              <option value="No">No</option>
+            </select>
+            <br />
+            <label for="tiene-patio">Cuenta con patio? (espacio con aire libre)</label>
+            <select name="tiene-patio">
+              <option value="Si">Si</option>
+              <option value="No">No</option>
+            </select>
+            <br />
+            <label for="personas-en-hogar">Cuantas personas viven en el hogar?</label>
+            <input type="number" name="personas-en-hogar" />
+            <br />
+          </div>
+
+          <div class="container" id="experiencia-mascotas">
+            <h2>Experiencia con mascotas</h2>
+            <label for="mascotas-anteriormente">Ha tenido mascotas anteriormente?</label>
+              <select name="mascotas-anteriormente">
+              <option value="Si">Si</option>
+              <option value="No">No</option>
+            </select>
+            <br />
+            <label for="tiene-mascotas">Actualmente tiene otras mascotas?</label>
+            <select name="tiene-mascotas">
+              <option value="Si">Si</option>
+              <option value="No">No</option>
+            </select>
+            <br />
+            <label for="tiene-veterinario">Cuenta con veterinario de confianza?</label>
+            <select name="tiene-veterinario">
+              <option value="Si">Si</option>
+              <option value="No">No</option>
+            </select>
+            <br />
+          </div>
+
+          <div class="container" id="compromisos">
+            <h2>Compromisos</h2>
+            <label for="cuidados-necesarios">Me comprometo a brindar los cuidados necesarios</label>
+              <select name="cuidados-necesarios">
+              <option value="Si">Si</option>
+              <option value="No">No</option>
+            </select>
+            <br />
+            <label for="visitas-seguimiento">Acepto que la organizacion haga visitas de seguimiento</label>
+            <select name="visitas-seguimiento">
+              <option value="Si">Si</option>
+              <option value="No">No</option>
+            </select>
+            <br />
+            <label for="responsabilidad">Estoy consciente de la responsabilidad de adoptar</label>
+            <select name="responsabilidad">
+              <option value="Si">Si</option>
+              <option value="No">No</option>
+            </select>
+            <br />
+          </div>
+
+          <div class="container" id="confirmacion">
+            <h2>Confirmacion</h2>
+            <label for="firma">Firma:</label>
+            <input type="text" name="firma" required/>
+            <br />
+            <label for="fecha">Fecha:</label>
+            <input type="date" name="fecha" required/>
+            <br />
+          </div>
+          <button class="button p-4 rounded-pill" type="submit">Enviar solicitud</button>
+        </form>
       </div>
     </main>
   </body>
