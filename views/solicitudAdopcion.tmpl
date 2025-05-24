@@ -5,6 +5,7 @@
     <title>Solicitud para {{ .Mascota.Nombre }}</title>
     {{ template "meta" . }}
     {{ template "librerias" . }}
+    <link rel="stylesheet" href="{{ .URL }}/assets/solicitudAdopcion.css" />
   </head>
   <body>
     {{ template "navbar" . }}

@@ -4,6 +4,8 @@
 - [ ] que hace contacto?
 - [ ] css para registrar.tmpl
 - [ ] css para solicitudAdopcion.tmpl
+- [ ] css para solicitudEnviada.tmpl
+- [ ] css para registrado.tmpl
 
 ## Para iniciar el servidor:
 
