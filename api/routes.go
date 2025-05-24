@@ -64,7 +64,7 @@ func getAdopcionById(c echo.Context) error {
 		"CurrentRoute": "/adopcion",
 		"Mascota":      mascota,
 	}
-	return c.Render(http.StatusOK, "solicitudAdopcion2", response)
+	return c.Render(http.StatusOK, "solicitudAdopcion", response)
 }
 
 func getContacto(c echo.Context) error {
