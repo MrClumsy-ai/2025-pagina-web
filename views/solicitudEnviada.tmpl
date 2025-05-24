@@ -1,0 +1,28 @@
+{{ define "solicitudEnviada" }}
+<!doctype html>
+<html lang="es">
+  <head>
+    <title>Mascota registrada</title>
+    {{ template "meta" . }}
+    {{ template "librerias" . }}
+  </head>
+  <body>
+    {{ template "navbar" . }}
+    <main class="container-fluid" style="margin-top: 80px">
+      <div class="container">
+        <h1>Solicitud para: {{ .Mascota.Nombre }}</h1>
+        <ul>
+          <li>{{ .InfoGeneral }}</li>
+          <li>{{ .InfoHogar }}</li>
+          <li>{{ .ExperienciaMascotas }}</li>
+          <li>{{ .Compromisos }}</li>
+          <li>{{ .Confirmacion }}</li>
+        </ul>
+        <div style="margin-top: 100px;">
+          <a class="p-4 rounded-pill button" href="{{ .URL }}/" >Regresar al menu principal</a>
+        </div>
+      </div>
+    </main>
+  </body>
+</html>
+{{ end }}

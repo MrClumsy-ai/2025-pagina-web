@@ -137,8 +137,8 @@ func getRegistrar(c echo.Context) error {
 	return c.Render(http.StatusOK, "registrar", response)
 }
 
-func postInfoGeneral(c echo.Context) error {
-	fmt.Printf("POST /adopcion/info-general/\n")
+func postAdopcion(c echo.Context) error {
+	fmt.Printf("POST /adopcion/\n")
 	pId, err := strconv.Atoi(c.Param("id"))
 	if err != nil {
 		e.Logger.Error(err)
@@ -150,7 +150,7 @@ func postInfoGeneral(c echo.Context) error {
 		return c.Render(http.StatusInternalServerError, "error", response)
 	}
 	fmt.Printf("id: %v\n", pId)
-	_, err = repository.GetMascotaById(pId)
+	mascota, err := repository.GetMascotaById(pId)
 	if err != nil {
 		e.Logger.Error(err)
 		response := map[string]any{
@@ -160,34 +160,28 @@ func postInfoGeneral(c echo.Context) error {
 		}
 		return c.Render(http.StatusNotFound, "error", response)
 	}
-
 	// info general
 	nombre := c.FormValue("nombre")
 	edad := c.FormValue("edad")
 	email := c.FormValue("email")
 	direccion := c.FormValue("direccion")
 	telefono := c.FormValue("telefono")
-
 	// info hogar
 	tipoDeVivienda := c.FormValue("tipo-de-vivienda")
 	esPropiedadVivienda := c.FormValue("is-propiedad-propia")
 	personasEnHogar := c.FormValue("personas-en-hogar")
 	tienePatio := c.FormValue("tiene-patio")
-
 	// experiencia-mascotas
 	mascotasAnteriormente := c.FormValue("mascotas-anteriormente")
 	tieneMascotas := c.FormValue("tiene-mascotas")
 	tieneVeterinario := c.FormValue("tiene-veterinario")
-
 	// compromisos
 	cuidadosNecesarios := c.FormValue("cuidados-necesarios")
 	visitasSeguimiento := c.FormValue("visitas-seguimiento")
 	responsabilidad := c.FormValue("responsabilidad")
-
 	// confirmacion
 	firma := c.FormValue("firma")
 	fecha := c.FormValue("fecha")
-
 	// error checking
 	infoGeneral, err := database.ValidarInfoGeneral(nombre, edad, email, direccion, telefono)
 	if err != nil {
@@ -199,7 +193,6 @@ func postInfoGeneral(c echo.Context) error {
 		}
 		return c.Render(http.StatusBadRequest, "error", response)
 	}
-
 	infoHogar, err := database.ValidarInfoHogar(tipoDeVivienda, esPropiedadVivienda, tienePatio, personasEnHogar)
 	if err != nil {
 		e.Logger.Error(err)
@@ -210,7 +203,6 @@ func postInfoGeneral(c echo.Context) error {
 		}
 		return c.Render(http.StatusBadRequest, "error", response)
 	}
-
 	experienciaMascotas, err := database.ValidarExperienciaMascotas(mascotasAnteriormente, tieneMascotas, tieneVeterinario)
 	if err != nil {
 		e.Logger.Error(err)
@@ -221,7 +213,6 @@ func postInfoGeneral(c echo.Context) error {
 		}
 		return c.Render(http.StatusBadRequest, "error", response)
 	}
-
 	compromisos, err := database.ValidarCompromisos(cuidadosNecesarios, visitasSeguimiento, responsabilidad)
 	if err != nil {
 		e.Logger.Error(err)
@@ -232,7 +223,6 @@ func postInfoGeneral(c echo.Context) error {
 		}
 		return c.Render(http.StatusBadRequest, "error", response)
 	}
-
 	confirmacion, err := database.ValidarConfirmacion(firma, fecha)
 	if err != nil {
 		e.Logger.Error(err)
@@ -243,17 +233,17 @@ func postInfoGeneral(c echo.Context) error {
 		}
 		return c.Render(http.StatusBadRequest, "error", response)
 	}
-
 	response := map[string]any{
 		"URL":                 _URL,
-		"MascotaId":           pId,
+		"Mascota":             mascota,
 		"InfoGeneral":         infoGeneral,
 		"InfoHogar":           infoHogar,
 		"ExperienciaMascotas": experienciaMascotas,
 		"Compromisos":         compromisos,
 		"Confirmacion":        confirmacion,
 	}
-	return c.Render(http.StatusOK, "informacionHogar", response)
+	// TODO AQUI, CATCHALL
+	return c.Render(http.StatusOK, "solicitudEnviada", response)
 }
 
 func postContacto(c echo.Context) error {
