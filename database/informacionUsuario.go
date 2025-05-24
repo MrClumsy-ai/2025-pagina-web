@@ -26,6 +26,12 @@ type ExperienciaMascotas struct {
 	TieneVeterinario      bool `form:"tiene-veterinario" json:"tiene-veterinario"`
 }
 
+type Compromisos struct {
+	CuidadosNecesarios bool `form:"cuidados-necesarios" json:"cuidados-necesarios"`
+	VisitasSeguimiento bool `form:"visitas-seguimiento" json:"visitas-seguimiento"`
+	Responsabilidad    bool `form:"responsabilidad" json:"responsabilidad"`
+}
+
 func ValidarInfoGeneral(nombre, edad, email, direccion, telefono string) (InformacionGeneral, error) {
 	if nombre == "" {
 		return InformacionGeneral{}, fmt.Errorf("Nombre no solicitado")
@@ -126,4 +132,35 @@ func ValidarExperienciaMascotas(mascotasAnteriormente, tieneMascotas, tieneVeter
 		return ExperienciaMascotas{}, fmt.Errorf("tiene veterinario respuesta no procesable")
 	}
 	return ExperienciaMascotas{MascotasAnteriormente: mascotasAnteriormente_d, TieneMascotas: tieneMascotas_d, TieneVeterinario: tieneVeterinario_d}, nil
+}
+
+func ValidarCompromisos(cuidadosNecesarios, visitasSeguimiento, responsabilidad string) (Compromisos, error) {
+	var cuidadosNecesarios_d bool
+	switch cuidadosNecesarios {
+	case "Si":
+		cuidadosNecesarios_d = true
+	case "No":
+		cuidadosNecesarios_d = false
+	default:
+		return Compromisos{}, fmt.Errorf("tiene veterinario respuesta no procesable")
+	}
+	var visitasSeguimiento_d bool
+	switch visitasSeguimiento {
+	case "Si":
+		visitasSeguimiento_d = true
+	case "No":
+		visitasSeguimiento_d = false
+	default:
+		return Compromisos{}, fmt.Errorf("tiene veterinario respuesta no procesable")
+	}
+	var responsabilidad_d bool
+	switch responsabilidad {
+	case "Si":
+		responsabilidad_d = true
+	case "No":
+		responsabilidad_d = false
+	default:
+		return Compromisos{}, fmt.Errorf("tiene veterinario respuesta no procesable")
+	}
+	return Compromisos{CuidadosNecesarios: cuidadosNecesarios_d, VisitasSeguimiento: visitasSeguimiento_d, Responsabilidad: responsabilidad_d}, nil
 }

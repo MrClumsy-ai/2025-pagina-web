@@ -149,21 +149,39 @@ func postInfoGeneral(c echo.Context) error {
 		return c.Render(http.StatusInternalServerError, "error", response)
 	}
 	fmt.Printf("POST /adopcion/info-general/%v\n", pId)
+	_, err = repository.GetMascotaById(pId)
+	if err != nil {
+		e.Logger.Error(err)
+		response := map[string]any{
+			"URL":     _URL,
+			"Code":    http.StatusNotFound,
+			"Message": "Mascota no encontrada",
+		}
+		return c.Render(http.StatusNotFound, "error", response)
+	}
+
 	// info general
 	nombre := c.FormValue("nombre")
 	edad := c.FormValue("edad")
 	email := c.FormValue("email")
 	direccion := c.FormValue("direccion")
 	telefono := c.FormValue("telefono")
+
 	// info hogar
 	tipoDeVivienda := c.FormValue("tipo-de-vivienda")
 	esPropiedadVivienda := c.FormValue("is-propiedad-propia")
 	personasEnHogar := c.FormValue("personas-en-hogar")
 	tienePatio := c.FormValue("tiene-patio")
+
 	// experiencia-mascotas
 	mascotasAnteriormente := c.FormValue("mascotas-anteriormente")
 	tieneMascotas := c.FormValue("tiene-mascotas")
 	tieneVeterinario := c.FormValue("tiene-veterinario")
+
+	// compromisos
+	cuidadosNecesarios := c.FormValue("cuidados-necesarios")
+	visitasSeguimiento := c.FormValue("visitas-seguimiento")
+	responsabilidad := c.FormValue("responsabilidad")
 
 	// error checking
 	infoGeneral, err := database.ValidarInfoGeneral(nombre, edad, email, direccion, telefono)
@@ -176,6 +194,7 @@ func postInfoGeneral(c echo.Context) error {
 		}
 		return c.Render(http.StatusBadRequest, "error", response)
 	}
+
 	infoHogar, err := database.ValidarInfoHogar(tipoDeVivienda, esPropiedadVivienda, tienePatio, personasEnHogar)
 	if err != nil {
 		e.Logger.Error(err)
@@ -186,6 +205,7 @@ func postInfoGeneral(c echo.Context) error {
 		}
 		return c.Render(http.StatusBadRequest, "error", response)
 	}
+
 	experienciaMascotas, err := database.ValidarExperienciaMascotas(mascotasAnteriormente, tieneMascotas, tieneVeterinario)
 	if err != nil {
 		e.Logger.Error(err)
@@ -196,22 +216,25 @@ func postInfoGeneral(c echo.Context) error {
 		}
 		return c.Render(http.StatusBadRequest, "error", response)
 	}
-	_, err = repository.GetMascotaById(pId)
+
+	compromisos, err := database.ValidarCompromisos(cuidadosNecesarios, visitasSeguimiento, responsabilidad)
 	if err != nil {
 		e.Logger.Error(err)
 		response := map[string]any{
 			"URL":     _URL,
-			"Code":    http.StatusNotFound,
-			"Message": "Mascota no encontrada",
+			"Code":    http.StatusBadRequest,
+			"Message": err,
 		}
-		return c.Render(http.StatusNotFound, "error", response)
+		return c.Render(http.StatusBadRequest, "error", response)
 	}
+
 	response := map[string]any{
 		"URL":                 _URL,
 		"MascotaId":           pId,
 		"InfoGeneral":         infoGeneral,
 		"InfoHogar":           infoHogar,
-		"experienciaMascotas": experienciaMascotas,
+		"ExperienciaMascotas": experienciaMascotas,
+		"Compromisos":         compromisos,
 	}
 	return c.Render(http.StatusOK, "informacionHogar", response)
 }
