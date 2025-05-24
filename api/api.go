@@ -38,7 +38,7 @@ func StartServer(url, port string) {
 	e = echo.New()
 	e.Static("/assets", "assets")
 	e.Renderer = newTemplate()
-	dbConnection, err := sql.Open("sqlite3", "pagina.db")
+	dbConnection, err := sql.Open("sqlite3", "database/pagina.db")
 	if err != nil {
 		e.Logger.Fatal("Error connecting to db")
 	}
