@@ -171,6 +171,6 @@ func ValidarCompromisos(cuidadosNecesarios, visitasSeguimiento, responsabilidad 
 	return Compromisos{CuidadosNecesarios: cuidadosNecesarios_d, VisitasSeguimiento: visitasSeguimiento_d, Responsabilidad: responsabilidad_d}, nil
 }
 
-func ValidarConfirmacion(firma, fecha string) (Confirmacion, error) {
+func ValidarConfirmacion(firma string) (Confirmacion, error) {
 	return Confirmacion{}, nil
 }

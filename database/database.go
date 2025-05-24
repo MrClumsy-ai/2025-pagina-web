@@ -29,5 +29,31 @@ func (r *DbRepository) Connect() error {
 	if err != nil {
 		return err
 	}
+	_, err = r.Db.Exec(`CREATE TABLE IF NOT EXISTS solicitudes (
+		id INTEGER PRIMARY KEY AUTOINCREMENT,
+		nombre TEXT NOT NULL,
+		edad INT NOT NULL,
+		direccion TEXT NOT NULL,
+		telefono INT NOT NULL,
+
+		tipoDeVivienda TEXT NOT NULL,
+		esPropiedadVivienda INT NOT NULL,
+		personasEnHogar TEXT NOT NULL,
+		tienePatio INT NOT NULL,
+
+		mascotasAnteriormente INT NOT NULL,
+		tieneMascotas TEXT NOT NULL,
+		tieneVeterinario int not null,
+
+		cuidadosNecesarios INT NOT NULL,
+		visitasSeguimiento INT NOT NULL,
+		responsabilidad INT NOT NULL,
+
+		firma TEXT NOT NULL,
+		fecha DATE NOT
+	)`)
+	if err != nil {
+		return err
+	}
 	return nil
 }

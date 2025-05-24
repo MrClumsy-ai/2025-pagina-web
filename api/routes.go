@@ -181,7 +181,6 @@ func postAdopcion(c echo.Context) error {
 	responsabilidad := c.FormValue("responsabilidad")
 	// confirmacion
 	firma := c.FormValue("firma")
-	fecha := c.FormValue("fecha")
 	// error checking
 	infoGeneral, err := database.ValidarInfoGeneral(nombre, edad, email, direccion, telefono)
 	if err != nil {
@@ -223,7 +222,7 @@ func postAdopcion(c echo.Context) error {
 		}
 		return c.Render(http.StatusBadRequest, "error", response)
 	}
-	confirmacion, err := database.ValidarConfirmacion(firma, fecha)
+	confirmacion, err := database.ValidarConfirmacion(firma)
 	if err != nil {
 		e.Logger.Error(err)
 		response := map[string]any{
