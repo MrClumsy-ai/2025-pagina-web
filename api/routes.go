@@ -138,6 +138,7 @@ func getRegistrar(c echo.Context) error {
 }
 
 func postInfoGeneral(c echo.Context) error {
+	fmt.Printf("POST /adopcion/info-general/\n")
 	pId, err := strconv.Atoi(c.Param("id"))
 	if err != nil {
 		e.Logger.Error(err)
@@ -148,7 +149,7 @@ func postInfoGeneral(c echo.Context) error {
 		}
 		return c.Render(http.StatusInternalServerError, "error", response)
 	}
-	fmt.Printf("POST /adopcion/info-general/%v\n", pId)
+	fmt.Printf("id: %v\n", pId)
 	_, err = repository.GetMascotaById(pId)
 	if err != nil {
 		e.Logger.Error(err)
@@ -182,6 +183,10 @@ func postInfoGeneral(c echo.Context) error {
 	cuidadosNecesarios := c.FormValue("cuidados-necesarios")
 	visitasSeguimiento := c.FormValue("visitas-seguimiento")
 	responsabilidad := c.FormValue("responsabilidad")
+
+	// confirmacion
+	firma := c.FormValue("firma")
+	fecha := c.FormValue("fecha")
 
 	// error checking
 	infoGeneral, err := database.ValidarInfoGeneral(nombre, edad, email, direccion, telefono)
@@ -228,6 +233,17 @@ func postInfoGeneral(c echo.Context) error {
 		return c.Render(http.StatusBadRequest, "error", response)
 	}
 
+	confirmacion, err := database.ValidarConfirmacion(firma, fecha)
+	if err != nil {
+		e.Logger.Error(err)
+		response := map[string]any{
+			"URL":     _URL,
+			"Code":    http.StatusBadRequest,
+			"Message": err,
+		}
+		return c.Render(http.StatusBadRequest, "error", response)
+	}
+
 	response := map[string]any{
 		"URL":                 _URL,
 		"MascotaId":           pId,
@@ -235,65 +251,9 @@ func postInfoGeneral(c echo.Context) error {
 		"InfoHogar":           infoHogar,
 		"ExperienciaMascotas": experienciaMascotas,
 		"Compromisos":         compromisos,
+		"Confirmacion":        confirmacion,
 	}
 	return c.Render(http.StatusOK, "informacionHogar", response)
-}
-
-func postInfoHogar(c echo.Context) error {
-	pId, err := strconv.Atoi(c.Param("id"))
-	if err != nil {
-		e.Logger.Error(err)
-		response := map[string]any{
-			"URL":     _URL,
-			"Code":    http.StatusInternalServerError,
-			"Message": "Param id unprocessable",
-		}
-		return c.Render(http.StatusInternalServerError, "error", response)
-	}
-	fmt.Printf("POST /adopcion/info-hogar/%v\n", pId)
-	tipoDeVivienda := c.FormValue("tipo-de-vivienda")
-	esPropiedadVivienda := c.FormValue("is-propiedad-propia")
-	personasEnHogar := c.FormValue("personas-en-hogar")
-	tienePatio := c.FormValue("tiene-patio")
-	// query params
-	nombre := c.QueryParam("nombre")
-	edad := c.QueryParam("edad")
-	email := c.QueryParam("email")
-	direccion := c.QueryParam("direccion")
-	telefono := c.QueryParam("telefono")
-	infoGeneral, err := database.ValidarInfoGeneral(nombre, edad, email, direccion, telefono)
-	if err != nil {
-		e.Logger.Error(err)
-		response := map[string]any{
-			"URL":     _URL,
-			"Code":    http.StatusBadRequest,
-			"Message": err,
-		}
-		return c.Render(http.StatusBadRequest, "error", response)
-	}
-	infoHogar, err := database.ValidarInfoHogar(tipoDeVivienda, esPropiedadVivienda, tienePatio, personasEnHogar)
-	if err != nil {
-		e.Logger.Error(err)
-		response := map[string]any{
-			"URL":     _URL,
-			"Code":    http.StatusBadRequest,
-			"Message": err,
-		}
-		return c.Render(http.StatusBadRequest, "error", response)
-	}
-	fmt.Println(infoGeneral)
-	fmt.Println(infoHogar)
-	response := map[string]any{
-		"URL":                _URL,
-		"MascotaId":          pId,
-		"InformacionGeneral": infoGeneral,
-		"InformacionHogar":   infoHogar,
-	}
-	return c.Render(http.StatusOK, "experienciaConMascotas", response)
-}
-
-func postExperienciaMascotas(c echo.Context) error {
-	return c.JSON(http.StatusOK, "/adopcion/experiencia-mascotas/:id")
 }
 
 func postContacto(c echo.Context) error {

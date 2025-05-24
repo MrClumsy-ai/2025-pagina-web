@@ -3,6 +3,7 @@ package database
 import (
 	"fmt"
 	"strconv"
+	"time"
 )
 
 type InformacionGeneral struct {
@@ -30,6 +31,11 @@ type Compromisos struct {
 	CuidadosNecesarios bool `form:"cuidados-necesarios" json:"cuidados-necesarios"`
 	VisitasSeguimiento bool `form:"visitas-seguimiento" json:"visitas-seguimiento"`
 	Responsabilidad    bool `form:"responsabilidad" json:"responsabilidad"`
+}
+
+type Confirmacion struct {
+	Firma string    `form:"firma" json:"firma"`
+	Fecha time.Time `form:"fecha" json:"fecha"`
 }
 
 func ValidarInfoGeneral(nombre, edad, email, direccion, telefono string) (InformacionGeneral, error) {
@@ -163,4 +169,8 @@ func ValidarCompromisos(cuidadosNecesarios, visitasSeguimiento, responsabilidad 
 		return Compromisos{}, fmt.Errorf("tiene veterinario respuesta no procesable")
 	}
 	return Compromisos{CuidadosNecesarios: cuidadosNecesarios_d, VisitasSeguimiento: visitasSeguimiento_d, Responsabilidad: responsabilidad_d}, nil
+}
+
+func ValidarConfirmacion(firma, fecha string) (Confirmacion, error) {
+	return Confirmacion{}, nil
 }
