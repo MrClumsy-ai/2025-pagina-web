@@ -174,3 +174,4 @@ func ValidarCompromisos(cuidadosNecesarios, visitasSeguimiento, responsabilidad 
 func ValidarConfirmacion(firma string) (Confirmacion, error) {
 	return Confirmacion{}, nil
 }
+func (r *DbRepository) InsertarSolicitud(infoGeneral InformacionGeneral, infoHogar InformacionHogar, expMascotas ExperienciaMascotas, compromisos Compromisos, confirmacion Confirmacion)
