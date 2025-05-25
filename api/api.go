@@ -11,10 +11,12 @@ import (
 	"github.com/labstack/echo/v4"
 )
 
-var e *echo.Echo
-var _PORT string
-var _URL string
-var repository *database.DbRepository
+var (
+	e          *echo.Echo
+	_PORT      string
+	_URL       string
+	repository *database.DbRepository
+)
 
 type Templates struct {
 	templates *template.Template
