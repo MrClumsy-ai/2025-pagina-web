@@ -181,7 +181,10 @@ func ValidarCompromisos(cuidadosNecesarios, visitasSeguimiento, responsabilidad 
 
 // todo
 func ValidarConfirmacion(firma string) (Confirmacion, error) {
-	return Confirmacion{}, nil
+	if firma == "" {
+		return Confirmacion{}, fmt.Errorf("Firma debe ser llenada")
+	}
+	return Confirmacion{Firma: firma}, nil
 }
 
 // todo
