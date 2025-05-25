@@ -38,6 +38,14 @@ type Confirmacion struct {
 	Fecha time.Time `form:"fecha" json:"fecha"`
 }
 
+type Solicitud struct {
+	InformacionGeneral
+	InformacionHogar
+	ExperienciaMascotas
+	Compromisos
+	Confirmacion
+}
+
 func ValidarInfoGeneral(nombre, edad, email, direccion, telefono string) (InformacionGeneral, error) {
 	if nombre == "" {
 		return InformacionGeneral{}, fmt.Errorf("Nombre no solicitado")
@@ -171,7 +179,12 @@ func ValidarCompromisos(cuidadosNecesarios, visitasSeguimiento, responsabilidad 
 	return Compromisos{CuidadosNecesarios: cuidadosNecesarios_d, VisitasSeguimiento: visitasSeguimiento_d, Responsabilidad: responsabilidad_d}, nil
 }
 
+// todo
 func ValidarConfirmacion(firma string) (Confirmacion, error) {
 	return Confirmacion{}, nil
 }
-func (r *DbRepository) InsertarSolicitud(infoGeneral InformacionGeneral, infoHogar InformacionHogar, expMascotas ExperienciaMascotas, compromisos Compromisos, confirmacion Confirmacion)
+
+// todo
+func (r *DbRepository) InsertarSolicitud(infoGeneral InformacionGeneral, infoHogar InformacionHogar, expMascotas ExperienciaMascotas, compromisos Compromisos, confirmacion Confirmacion) (Solicitud, error) {
+	return Solicitud{}, nil
+}
