@@ -36,7 +36,7 @@ go run main.go
 ```
 git config --global user.name "UsuarioDeGit"
 git config --global user.email usuariodegit@gmail.com
-git config --global init.default branch main
+git config --global init.defaultBranch main
 ```
 
 3. ir a github > perfil > ajustes > developer settings > personal access tokens > tokens (classic)
@@ -58,9 +58,10 @@ cd tu/ubicacion/
 git clone https://ghp_TuToken@github.com/Usuario/Repo
 ```
 
-12. abrir con algun editor de texto (vs code, neovim, etc) con
+12. ir a la ubicacion y abrir con algun editor de texto (vs code, neovim, etc) con
 
 ```
+cd repo
 code . # para vscode
 nvim . # para neovim
 ```
@@ -74,15 +75,21 @@ git commit -m "mensaje corto describiendo tus cambios" -m "mensaje mas largo des
 git pull --rebase
 git push
 ```
-15. Si es que sale algún error en ```git pull --rebase```, abortar el rebase usando
+
+15. Si es que sale algún error en `git pull --rebase`, abortar el rebase usando
+
 ```
 git rebase --abort
 ```
+
 Usar ahora un git pull regular y arreglar los conflictos de merge
+
 ```
 git pull
 ```
+
 Una vez resueltos los conflictos, hacer otro commit con el mensaje de "merge"
+
 ```
 git add .
 git commit -m "merge"
