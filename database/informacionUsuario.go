@@ -186,7 +186,6 @@ func ValidarConfirmacion(firma string) (Confirmacion, error) {
 	return Confirmacion{Firma: firma}, nil
 }
 
-// todo
 func (r *DbRepository) InsertarSolicitud(idMascota int, infoGeneral InformacionGeneral, infoHogar InformacionHogar, expMascotas ExperienciaMascotas, compromisos Compromisos, confirmacion Confirmacion) (Solicitud, error) {
 	_, err := r.Db.Exec(`
 		INSERT INTO solicitudes (
