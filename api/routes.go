@@ -369,6 +369,19 @@ func jsonGetMascotaById(c echo.Context) error {
 	return c.JSON(http.StatusFound, mascota)
 }
 
+func jsonGetSolicitudes(c echo.Context) error {
+	fmt.Printf("GET /json/solicitudes\n")
+	solicitudes, err := repository.GetAllSolicitudes()
+	if err != nil {
+		e.Logger.Error(err)
+		return c.JSON(http.StatusInternalServerError, err)
+	}
+	if len(solicitudes) == 0 {
+		return c.JSON(http.StatusNotFound, "Solicitudes not found")
+	}
+	return c.JSON(http.StatusFound, solicitudes)
+}
+
 func jsonDelContacto(c echo.Context) error {
 	pId, err := strconv.Atoi(c.Param("id"))
 	if err != nil {

@@ -46,6 +46,8 @@ type Solicitud struct {
 	Confirmacion
 }
 
+type Solicitudes []Solicitud
+
 func ValidarInfoGeneral(nombre, edad, email, direccion, telefono string) (InformacionGeneral, error) {
 	if nombre == "" {
 		return InformacionGeneral{}, fmt.Errorf("Nombre no solicitado")
@@ -242,3 +244,76 @@ func (r *DbRepository) InsertarSolicitud(idMascota int, infoGeneral InformacionG
 	fmt.Printf("inserted id: %v\n", solicitud.Id)
 	return solicitud, nil
 }
+
+func (r *DbRepository) GetAllSolicitudes() (Solicitudes, error) {
+	rows, err := r.Db.Query("SELECT * FROM solicitudes")
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var solicitudes Solicitudes
+	for rows.Next() {
+		var solicitud Solicitud
+		err := rows.Scan(
+			&solicitud.InformacionGeneral.Id,
+			&solicitud.InformacionGeneral.IdMascota,
+			&solicitud.InformacionGeneral.Nombre,
+			&solicitud.InformacionGeneral.Edad,
+			&solicitud.InformacionGeneral.Direccion,
+			&solicitud.InformacionGeneral.Telefono,
+
+			&solicitud.InformacionHogar.TipoDeVivienda,
+			&solicitud.InformacionHogar.EsPropiedadVivienda,
+			&solicitud.InformacionHogar.PersonasEnHogar,
+			&solicitud.InformacionHogar.TienePatio,
+
+			&solicitud.ExperienciaMascotas.MascotasAnteriormente,
+			&solicitud.ExperienciaMascotas.TieneMascotas,
+			&solicitud.ExperienciaMascotas.TieneVeterinario,
+
+			&solicitud.Compromisos.CuidadosNecesarios,
+			&solicitud.Compromisos.VisitasSeguimiento,
+			&solicitud.Compromisos.Responsabilidad,
+
+			&solicitud.Confirmacion.Firma)
+		if err != nil {
+			return nil, err
+		}
+		solicitudes = append(solicitudes, solicitud)
+	}
+	if len(solicitudes) == 0 {
+		return Solicitudes{}, nil
+	}
+	return solicitudes, nil
+}
+
+/*
+func (r *DbRepository) GetAllMascotas() (Mascotas, error) {
+	rows, err := r.Db.Query("SELECT * FROM mascotas")
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var mascotas Mascotas
+	for rows.Next() {
+		var mascota Mascota
+		err := rows.Scan(&mascota.Id, &mascota.Nombre, &mascota.Edad, &mascota.Altura_cm, &mascota.Foto64, &mascota.Descripcion)
+		if err != nil {
+			return nil, err
+		}
+		mascotas = append(mascotas, mascota)
+	}
+	if len(mascotas) == 0 {
+		return Mascotas{}, nil
+	}
+	return mascotas, nil
+}
+
+func (r *DbRepository) GetMascotaById(id int) (Mascota, error) {
+	var mascota Mascota
+	err := r.Db.QueryRow("SELECT * FROM mascotas WHERE ID = ?", id).Scan(&mascota.Id, &mascota.Nombre, &mascota.Edad, &mascota.Altura_cm, &mascota.Foto64, &mascota.Descripcion)
+	if err != nil {
+		return Mascota{}, err
+	}
+	return mascota, nil
+} */
