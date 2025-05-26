@@ -190,7 +190,7 @@ func ValidarConfirmacion(firma string) (Confirmacion, error) {
 func (r *DbRepository) InsertarSolicitud(idMascota int, infoGeneral InformacionGeneral, infoHogar InformacionHogar, expMascotas ExperienciaMascotas, compromisos Compromisos, confirmacion Confirmacion) (Solicitud, error) {
 	_, err := r.Db.Exec(`
 		INSERT INTO solicitudes (
-			idMascota,
+			mascotaId,
 			nombre, edad, direccion, telefono,
 			tipoDeVivienda, esPropiedadVivienda, personasEnHogar, tienePatio,
 			mascotasAnteriormente, tieneMascotas, tieneVeterinario,
@@ -216,10 +216,26 @@ func (r *DbRepository) InsertarSolicitud(idMascota int, infoGeneral InformacionG
 	row := r.Db.QueryRow("SELECT * FROM solicitudes ORDER BY ROWID DESC LIMIT 1")
 	var solicitud Solicitud
 	err = row.Scan(
-		&solicitud.InformacionGeneral.Id, &solicitud.InformacionGeneral.IdMascota, &solicitud.InformacionGeneral.Nombre, &solicitud.InformacionGeneral.Direccion, &solicitud.InformacionGeneral.Telefono,
-		&solicitud.InformacionHogar.TipoDeVivienda, &solicitud.InformacionHogar.EsPropiedadVivienda, &solicitud.InformacionHogar.EsPropiedadVivienda, &solicitud.InformacionHogar.PersonasEnHogar, &solicitud.InformacionHogar.TienePatio,
-		&solicitud.ExperienciaMascotas.MascotasAnteriormente, &solicitud.ExperienciaMascotas.TieneMascotas, &solicitud.ExperienciaMascotas.TieneVeterinario,
-		&solicitud.Compromisos.CuidadosNecesarios, &solicitud.Compromisos.VisitasSeguimiento, &solicitud.Compromisos.Responsabilidad,
+		&solicitud.InformacionGeneral.Id,
+		&solicitud.InformacionGeneral.IdMascota,
+		&solicitud.InformacionGeneral.Nombre,
+		&solicitud.InformacionGeneral.Edad,
+		&solicitud.InformacionGeneral.Direccion,
+		&solicitud.InformacionGeneral.Telefono,
+
+		&solicitud.InformacionHogar.TipoDeVivienda,
+		&solicitud.InformacionHogar.EsPropiedadVivienda,
+		&solicitud.InformacionHogar.PersonasEnHogar,
+		&solicitud.InformacionHogar.TienePatio,
+
+		&solicitud.ExperienciaMascotas.MascotasAnteriormente,
+		&solicitud.ExperienciaMascotas.TieneMascotas,
+		&solicitud.ExperienciaMascotas.TieneVeterinario,
+
+		&solicitud.Compromisos.CuidadosNecesarios,
+		&solicitud.Compromisos.VisitasSeguimiento,
+		&solicitud.Compromisos.Responsabilidad,
+
 		&solicitud.Confirmacion.Firma)
 	if err != nil {
 		return Solicitud{}, err

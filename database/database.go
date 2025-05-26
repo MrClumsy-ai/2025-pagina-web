@@ -50,7 +50,7 @@ func (r *DbRepository) Connect() error {
 		visitasSeguimiento INT NOT NULL,
 		responsabilidad INT NOT NULL,
 
-		firma TEXT NOT NULL
+		firma TEXT NOT NULL,
 		FOREIGN KEY (mascotaId) REFERENCES mascotas(id)
 	)`)
 	if err != nil {
