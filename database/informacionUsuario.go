@@ -192,21 +192,21 @@ func (r *DbRepository) InsertarSolicitud(idMascota int, infoGeneral InformacionG
 	_, err := r.Db.Exec(`
 		INSERT INTO solicitudes (
 			mascotaId,
-			nombre, edad, direccion, telefono,
+			nombre, edad, direccion, email, telefono,
 			tipoDeVivienda, esPropiedadVivienda, personasEnHogar, tienePatio,
 			mascotasAnteriormente, tieneMascotas, tieneVeterinario,
 			cuidadosNecesarios, visitasSeguimiento, responsabilidad,
 			firma)
 		VALUES (
 			?,
-			?,?,?,?,
+			?,?,?,?,?,
 			?,?,?,?,
 			?,?,?,
 			?,?,?,
 			?)
 		`,
 		idMascota,
-		infoGeneral.Nombre, infoGeneral.Edad, infoGeneral.Direccion, infoGeneral.Telefono,
+		infoGeneral.Nombre, infoGeneral.Edad, infoGeneral.Direccion, infoGeneral.Email, infoGeneral.Telefono,
 		infoHogar.TipoDeVivienda, infoHogar.EsPropiedadVivienda, infoHogar.PersonasEnHogar, infoHogar.TienePatio,
 		expMascotas.MascotasAnteriormente, expMascotas.TieneMascotas, expMascotas.TieneVeterinario,
 		compromisos.CuidadosNecesarios, compromisos.VisitasSeguimiento, compromisos.Responsabilidad,
@@ -222,6 +222,7 @@ func (r *DbRepository) InsertarSolicitud(idMascota int, infoGeneral InformacionG
 		&solicitud.InformacionGeneral.Nombre,
 		&solicitud.InformacionGeneral.Edad,
 		&solicitud.InformacionGeneral.Direccion,
+		&solicitud.InformacionGeneral.Email,
 		&solicitud.InformacionGeneral.Telefono,
 
 		&solicitud.InformacionHogar.TipoDeVivienda,
@@ -260,6 +261,7 @@ func (r *DbRepository) GetAllSolicitudes() (Solicitudes, error) {
 			&solicitud.InformacionGeneral.Nombre,
 			&solicitud.InformacionGeneral.Edad,
 			&solicitud.InformacionGeneral.Direccion,
+			&solicitud.InformacionGeneral.Email,
 			&solicitud.InformacionGeneral.Telefono,
 
 			&solicitud.InformacionHogar.TipoDeVivienda,

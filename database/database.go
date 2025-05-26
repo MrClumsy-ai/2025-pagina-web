@@ -35,6 +35,7 @@ func (r *DbRepository) Connect() error {
 		nombre TEXT NOT NULL,
 		edad INT NOT NULL,
 		direccion TEXT NOT NULL,
+		email TEXT NOT NULL,
 		telefono INT NOT NULL,
 
 		tipoDeVivienda TEXT NOT NULL,
