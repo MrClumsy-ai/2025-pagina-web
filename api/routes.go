@@ -231,14 +231,20 @@ func postAdopcion(c echo.Context) error {
 		}
 		return c.Render(http.StatusBadRequest, "error", response)
 	}
+	solicitud, err := repository.InsertarSolicitud(infoGeneral, infoHogar, experienciaMascotas, compromisos, confirmacion)
+	if err != nil {
+		e.Logger.Error(err)
+		response := map[string]any{
+			"URL":     _URL,
+			"Code":    http.StatusBadRequest,
+			"Message": err,
+		}
+		return c.Render(http.StatusBadRequest, "error", response)
+	}
 	response := map[string]any{
-		"URL":                 _URL,
-		"Mascota":             mascota,
-		"InfoGeneral":         infoGeneral,
-		"InfoHogar":           infoHogar,
-		"ExperienciaMascotas": experienciaMascotas,
-		"Compromisos":         compromisos,
-		"Confirmacion":        confirmacion,
+		"URL":       _URL,
+		"Mascota":   mascota,
+		"Solicitud": solicitud,
 	}
 	// TODO AQUI, CATCHALL
 	return c.Render(http.StatusOK, "solicitudEnviada", response)
