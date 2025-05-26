@@ -65,12 +65,12 @@ func ValidarInfoGeneral(nombre, edad, email, direccion, telefono string) (Inform
 	if direccion == "" {
 		return InformacionGeneral{}, fmt.Errorf("Direccion no solicitada")
 	}
+	if len(telefono) != 10 {
+		return InformacionGeneral{}, fmt.Errorf("Telefono debe tener 10 digitos")
+	}
 	telefono_p, err := strconv.Atoi(telefono)
 	if err != nil {
-		return InformacionGeneral{}, err
-	}
-	if telefono_p < 1_000_000_000 || telefono_p > 9_999_999_999 {
-		return InformacionGeneral{}, fmt.Errorf("Telefono debe tener 10 digitos")
+		return InformacionGeneral{}, fmt.Errorf("Telefono no procesable")
 	}
 	return InformacionGeneral{
 		Nombre:    nombre,
