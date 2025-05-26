@@ -401,9 +401,28 @@ func jsonDelMascota(c echo.Context) error {
 	pId, err := strconv.Atoi(c.Param("id"))
 	if err != nil {
 		e.Logger.Error(err)
-		return c.JSON(http.StatusUnprocessableEntity, "param id no procesable")
+		return c.JSON(http.StatusUnprocessableEntity, err)
 	}
 	fmt.Printf("DELETE /json/mascotas/%v\n", pId)
 	mascota, err := repository.DelMascota(pId)
+	if err != nil {
+		e.Logger.Error(err)
+		return c.JSON(http.StatusNotFound, "Mascota no encontrada")
+	}
 	return c.JSON(http.StatusOK, mascota)
+}
+
+func jsonDelSolicitud(c echo.Context) error {
+	pId, err := strconv.Atoi(c.Param("id"))
+	if err != nil {
+		e.Logger.Error(err)
+		return c.JSON(http.StatusUnprocessableEntity, err)
+	}
+	fmt.Printf("DELETE /json/adopcion/%v\n", pId)
+	solicitud, err := repository.DelSolicitud(pId)
+	if err != nil {
+		e.Logger.Error(err)
+		return c.JSON(http.StatusNotFound, "Solicitud no encontrada")
+	}
+	return c.JSON(http.StatusOK, solicitud)
 }

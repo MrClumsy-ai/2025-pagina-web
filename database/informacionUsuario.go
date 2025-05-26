@@ -217,28 +217,28 @@ func (r *DbRepository) InsertarSolicitud(idMascota int, infoGeneral InformacionG
 	row := r.Db.QueryRow("SELECT * FROM solicitudes ORDER BY ROWID DESC LIMIT 1")
 	var solicitud Solicitud
 	err = row.Scan(
-		&solicitud.InformacionGeneral.Id,
-		&solicitud.InformacionGeneral.IdMascota,
-		&solicitud.InformacionGeneral.Nombre,
-		&solicitud.InformacionGeneral.Edad,
-		&solicitud.InformacionGeneral.Direccion,
-		&solicitud.InformacionGeneral.Email,
-		&solicitud.InformacionGeneral.Telefono,
+		&solicitud.Id,
+		&solicitud.IdMascota,
+		&solicitud.Nombre,
+		&solicitud.Edad,
+		&solicitud.Direccion,
+		&solicitud.Email,
+		&solicitud.Telefono,
 
-		&solicitud.InformacionHogar.TipoDeVivienda,
-		&solicitud.InformacionHogar.EsPropiedadVivienda,
-		&solicitud.InformacionHogar.PersonasEnHogar,
-		&solicitud.InformacionHogar.TienePatio,
+		&solicitud.TipoDeVivienda,
+		&solicitud.EsPropiedadVivienda,
+		&solicitud.PersonasEnHogar,
+		&solicitud.TienePatio,
 
-		&solicitud.ExperienciaMascotas.MascotasAnteriormente,
-		&solicitud.ExperienciaMascotas.TieneMascotas,
-		&solicitud.ExperienciaMascotas.TieneVeterinario,
+		&solicitud.MascotasAnteriormente,
+		&solicitud.TieneMascotas,
+		&solicitud.TieneVeterinario,
 
-		&solicitud.Compromisos.CuidadosNecesarios,
-		&solicitud.Compromisos.VisitasSeguimiento,
-		&solicitud.Compromisos.Responsabilidad,
+		&solicitud.CuidadosNecesarios,
+		&solicitud.VisitasSeguimiento,
+		&solicitud.Responsabilidad,
 
-		&solicitud.Confirmacion.Firma)
+		&solicitud.Firma)
 	if err != nil {
 		return Solicitud{}, err
 	}
@@ -256,28 +256,28 @@ func (r *DbRepository) GetAllSolicitudes() (Solicitudes, error) {
 	for rows.Next() {
 		var solicitud Solicitud
 		err := rows.Scan(
-			&solicitud.InformacionGeneral.Id,
-			&solicitud.InformacionGeneral.IdMascota,
-			&solicitud.InformacionGeneral.Nombre,
-			&solicitud.InformacionGeneral.Edad,
-			&solicitud.InformacionGeneral.Direccion,
-			&solicitud.InformacionGeneral.Email,
-			&solicitud.InformacionGeneral.Telefono,
+			&solicitud.Id,
+			&solicitud.IdMascota,
+			&solicitud.Nombre,
+			&solicitud.Edad,
+			&solicitud.Direccion,
+			&solicitud.Email,
+			&solicitud.Telefono,
 
-			&solicitud.InformacionHogar.TipoDeVivienda,
-			&solicitud.InformacionHogar.EsPropiedadVivienda,
-			&solicitud.InformacionHogar.PersonasEnHogar,
-			&solicitud.InformacionHogar.TienePatio,
+			&solicitud.TipoDeVivienda,
+			&solicitud.EsPropiedadVivienda,
+			&solicitud.PersonasEnHogar,
+			&solicitud.TienePatio,
 
-			&solicitud.ExperienciaMascotas.MascotasAnteriormente,
-			&solicitud.ExperienciaMascotas.TieneMascotas,
-			&solicitud.ExperienciaMascotas.TieneVeterinario,
+			&solicitud.MascotasAnteriormente,
+			&solicitud.TieneMascotas,
+			&solicitud.TieneVeterinario,
 
-			&solicitud.Compromisos.CuidadosNecesarios,
-			&solicitud.Compromisos.VisitasSeguimiento,
-			&solicitud.Compromisos.Responsabilidad,
+			&solicitud.CuidadosNecesarios,
+			&solicitud.VisitasSeguimiento,
+			&solicitud.Responsabilidad,
 
-			&solicitud.Confirmacion.Firma)
+			&solicitud.Firma)
 		if err != nil {
 			return nil, err
 		}
@@ -289,33 +289,47 @@ func (r *DbRepository) GetAllSolicitudes() (Solicitudes, error) {
 	return solicitudes, nil
 }
 
-/*
-func (r *DbRepository) GetAllMascotas() (Mascotas, error) {
-	rows, err := r.Db.Query("SELECT * FROM mascotas")
+func (r *DbRepository) GetSolicitudById(id int) (Solicitud, error) {
+	var solicitud Solicitud
+	err := r.Db.QueryRow("SELECT * FROM solicitudes WHERE ID = ?", id).Scan(
+		&solicitud.Id,
+		&solicitud.IdMascota,
+		&solicitud.Nombre,
+		&solicitud.Edad,
+		&solicitud.Direccion,
+		&solicitud.Email,
+		&solicitud.Telefono,
+
+		&solicitud.TipoDeVivienda,
+		&solicitud.EsPropiedadVivienda,
+		&solicitud.PersonasEnHogar,
+		&solicitud.TienePatio,
+
+		&solicitud.MascotasAnteriormente,
+		&solicitud.TieneMascotas,
+		&solicitud.TieneVeterinario,
+
+		&solicitud.CuidadosNecesarios,
+		&solicitud.VisitasSeguimiento,
+		&solicitud.Responsabilidad,
+
+		&solicitud.Firma)
 	if err != nil {
-		return nil, err
+		return Solicitud{}, err
 	}
-	defer rows.Close()
-	var mascotas Mascotas
-	for rows.Next() {
-		var mascota Mascota
-		err := rows.Scan(&mascota.Id, &mascota.Nombre, &mascota.Edad, &mascota.Altura_cm, &mascota.Foto64, &mascota.Descripcion)
-		if err != nil {
-			return nil, err
-		}
-		mascotas = append(mascotas, mascota)
-	}
-	if len(mascotas) == 0 {
-		return Mascotas{}, nil
-	}
-	return mascotas, nil
+	return solicitud, nil
 }
 
-func (r *DbRepository) GetMascotaById(id int) (Mascota, error) {
-	var mascota Mascota
-	err := r.Db.QueryRow("SELECT * FROM mascotas WHERE ID = ?", id).Scan(&mascota.Id, &mascota.Nombre, &mascota.Edad, &mascota.Altura_cm, &mascota.Foto64, &mascota.Descripcion)
+func (r *DbRepository) DelSolicitud(id int) (Solicitud, error) {
+	solicitud, err := r.GetSolicitudById(id)
 	if err != nil {
-		return Mascota{}, err
+		return Solicitud{}, err
 	}
-	return mascota, nil
-} */
+	fmt.Println(solicitud)
+	_, err = r.Db.Exec("DELETE FROM solicitudes WHERE id = ?", solicitud.Id)
+	if err != nil {
+		return Solicitud{}, err
+	}
+	fmt.Println(solicitud.Id)
+	return solicitud, nil
+}

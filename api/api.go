@@ -78,5 +78,6 @@ func StartServer(url, port string) {
 	e.GET("/json/solicitudes", jsonGetSolicitudes)
 	e.DELETE("/json/contacto/:id", jsonDelContacto)
 	e.DELETE("/json/mascotas/:id", jsonDelMascota)
+	e.DELETE("/json/solicitudes/:id", jsonDelSolicitud)
 	e.Logger.Fatal(e.Start(_PORT))
 }
