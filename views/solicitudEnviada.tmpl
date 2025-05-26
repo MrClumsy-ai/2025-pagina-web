@@ -11,14 +11,9 @@
     {{ template "navbar" . }}
     <main class="container-fluid" style="margin-top: 80px">
       <div class="container">
-        <h1>Solicitud para: {{ .Mascota.Nombre }}</h1>
-        <ul>
-          <li>{{ .InfoGeneral }}</li>
-          <li>{{ .InfoHogar }}</li>
-          <li>{{ .ExperienciaMascotas }}</li>
-          <li>{{ .Compromisos }}</li>
-          <li>{{ .Confirmacion }}</li>
-        </ul>
+        <h1>Solicitud enviada!</h1>
+        <p>De: {{ .Solicitud.InformacionGeneral.Nombre }}({{ .Solicitud.InformacionGeneral.Email }})</p>
+        <p>Para: {{ .Mascota.Nombre }}</p>
         <div style="margin-top: 100px;">
           <a class="p-4 rounded-pill button" href="{{ .URL }}/" >Regresar al menu principal</a>
         </div>
