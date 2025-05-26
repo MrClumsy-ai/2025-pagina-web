@@ -7,6 +7,7 @@ import (
 
 type InformacionGeneral struct {
 	Id        int    `form:"id" json:"id"`
+	IdMascota int    `form:"idMascota" json:"idMascota"`
 	Nombre    string `form:"nombre" json:"nombre"`
 	Edad      int    `form:"edad" json:"edad"`
 	Email     string `form:"email" json:"email"`
@@ -186,16 +187,24 @@ func ValidarConfirmacion(firma string) (Confirmacion, error) {
 }
 
 // todo
-func (r *DbRepository) InsertarSolicitud(infoGeneral InformacionGeneral, infoHogar InformacionHogar, expMascotas ExperienciaMascotas, compromisos Compromisos, confirmacion Confirmacion) (Solicitud, error) {
+func (r *DbRepository) InsertarSolicitud(idMascota int, infoGeneral InformacionGeneral, infoHogar InformacionHogar, expMascotas ExperienciaMascotas, compromisos Compromisos, confirmacion Confirmacion) (Solicitud, error) {
 	_, err := r.Db.Exec(`
 		INSERT INTO solicitudes (
+			idMascota,
 			nombre, edad, direccion, telefono,
 			tipoDeVivienda, esPropiedadVivienda, personasEnHogar, tienePatio,
 			mascotasAnteriormente, tieneMascotas, tieneVeterinario,
 			cuidadosNecesarios, visitasSeguimiento, responsabilidad,
 			firma)
-		VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)
+		VALUES (
+			?,
+			?,?,?,?,
+			?,?,?,?,
+			?,?,?,
+			?,?,?,
+			?)
 		`,
+		idMascota,
 		infoGeneral.Nombre, infoGeneral.Edad, infoGeneral.Direccion, infoGeneral.Telefono,
 		infoHogar.TipoDeVivienda, infoHogar.EsPropiedadVivienda, infoHogar.PersonasEnHogar, infoHogar.TienePatio,
 		expMascotas.MascotasAnteriormente, expMascotas.TieneMascotas, expMascotas.TieneVeterinario,
@@ -207,7 +216,7 @@ func (r *DbRepository) InsertarSolicitud(infoGeneral InformacionGeneral, infoHog
 	row := r.Db.QueryRow("SELECT * FROM solicitudes ORDER BY ROWID DESC LIMIT 1")
 	var solicitud Solicitud
 	err = row.Scan(
-		&solicitud.InformacionGeneral.Id, &solicitud.InformacionGeneral.Nombre, &solicitud.InformacionGeneral.Direccion, &solicitud.InformacionGeneral.Telefono,
+		&solicitud.InformacionGeneral.Id, &solicitud.InformacionGeneral.IdMascota, &solicitud.InformacionGeneral.Nombre, &solicitud.InformacionGeneral.Direccion, &solicitud.InformacionGeneral.Telefono,
 		&solicitud.InformacionHogar.TipoDeVivienda, &solicitud.InformacionHogar.EsPropiedadVivienda, &solicitud.InformacionHogar.EsPropiedadVivienda, &solicitud.InformacionHogar.PersonasEnHogar, &solicitud.InformacionHogar.TienePatio,
 		&solicitud.ExperienciaMascotas.MascotasAnteriormente, &solicitud.ExperienciaMascotas.TieneMascotas, &solicitud.ExperienciaMascotas.TieneVeterinario,
 		&solicitud.Compromisos.CuidadosNecesarios, &solicitud.Compromisos.VisitasSeguimiento, &solicitud.Compromisos.Responsabilidad,

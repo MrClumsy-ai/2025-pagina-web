@@ -231,7 +231,7 @@ func postAdopcion(c echo.Context) error {
 		}
 		return c.Render(http.StatusBadRequest, "error", response)
 	}
-	solicitud, err := repository.InsertarSolicitud(infoGeneral, infoHogar, experienciaMascotas, compromisos, confirmacion)
+	solicitud, err := repository.InsertarSolicitud(pId, infoGeneral, infoHogar, experienciaMascotas, compromisos, confirmacion)
 	if err != nil {
 		e.Logger.Error(err)
 		response := map[string]any{
@@ -246,7 +246,6 @@ func postAdopcion(c echo.Context) error {
 		"Mascota":   mascota,
 		"Solicitud": solicitud,
 	}
-	// TODO AQUI, CATCHALL
 	return c.Render(http.StatusOK, "solicitudEnviada", response)
 }
 
