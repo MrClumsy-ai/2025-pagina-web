@@ -3,10 +3,10 @@ package database
 import (
 	"fmt"
 	"strconv"
-	"time"
 )
 
 type InformacionGeneral struct {
+	Id        int    `form:"id" json:"id"`
 	Nombre    string `form:"nombre" json:"nombre"`
 	Edad      int    `form:"edad" json:"edad"`
 	Email     string `form:"email" json:"email"`
@@ -34,8 +34,7 @@ type Compromisos struct {
 }
 
 type Confirmacion struct {
-	Firma string    `form:"firma" json:"firma"`
-	Fecha time.Time `form:"fecha" json:"fecha"`
+	Firma string `form:"firma" json:"firma"`
 }
 
 type Solicitud struct {
@@ -188,5 +187,34 @@ func ValidarConfirmacion(firma string) (Confirmacion, error) {
 
 // todo
 func (r *DbRepository) InsertarSolicitud(infoGeneral InformacionGeneral, infoHogar InformacionHogar, expMascotas ExperienciaMascotas, compromisos Compromisos, confirmacion Confirmacion) (Solicitud, error) {
-	return Solicitud{}, nil
+	_, err := r.Db.Exec(`
+		INSERT INTO solicitudes (
+			nombre, edad, direccion, telefono,
+			tipoDeVivienda, esPropiedadVivienda, personasEnHogar, tienePatio,
+			mascotasAnteriormente, tieneMascotas, tieneVeterinario,
+			cuidadosNecesarios, visitasSeguimiento, responsabilidad,
+			firma)
+		VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)
+		`,
+		infoGeneral.Nombre, infoGeneral.Edad, infoGeneral.Direccion, infoGeneral.Telefono,
+		infoHogar.TipoDeVivienda, infoHogar.EsPropiedadVivienda, infoHogar.PersonasEnHogar, infoHogar.TienePatio,
+		expMascotas.MascotasAnteriormente, expMascotas.TieneMascotas, expMascotas.TieneVeterinario,
+		compromisos.CuidadosNecesarios, compromisos.VisitasSeguimiento, compromisos.Responsabilidad,
+		confirmacion.Firma)
+	if err != nil {
+		return Solicitud{}, err
+	}
+	row := r.Db.QueryRow("SELECT * FROM solicitudes ORDER BY ROWID DESC LIMIT 1")
+	var solicitud Solicitud
+	err = row.Scan(
+		&solicitud.InformacionGeneral.Id, &solicitud.InformacionGeneral.Nombre, &solicitud.InformacionGeneral.Direccion, &solicitud.InformacionGeneral.Telefono,
+		&solicitud.InformacionHogar.TipoDeVivienda, &solicitud.InformacionHogar.EsPropiedadVivienda, &solicitud.InformacionHogar.EsPropiedadVivienda, &solicitud.InformacionHogar.PersonasEnHogar, &solicitud.InformacionHogar.TienePatio,
+		&solicitud.ExperienciaMascotas.MascotasAnteriormente, &solicitud.ExperienciaMascotas.TieneMascotas, &solicitud.ExperienciaMascotas.TieneVeterinario,
+		&solicitud.Compromisos.CuidadosNecesarios, &solicitud.Compromisos.VisitasSeguimiento, &solicitud.Compromisos.Responsabilidad,
+		&solicitud.Confirmacion.Firma)
+	if err != nil {
+		return Solicitud{}, err
+	}
+	fmt.Printf("inserted id: %v\n", solicitud.Id)
+	return solicitud, nil
 }
